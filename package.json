@@ -17,12 +17,9 @@
     "@types/puppeteer": "^2.0.1",
     "@types/sqlite3": "^3.1.6",
     "core-js": "^3.2.1",
-    "epubjs": "file:ext/epub",
-    "ibooks-highlights": "0.0.3",
     "pdfjs-dist": "^2.3.200",
-    "puppeteer": "^3.0.1",
     "sqlite3": "^4.2.0",
-    "webpack": "^4.43.0"
+    "yaml": "^1.9.2"
   },
   "devDependencies": {
     "mocha": "^6.2.1"

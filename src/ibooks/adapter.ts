@@ -16,10 +16,16 @@
 import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
 import { constructRecord } from '../utils';
+import { readFileSync } from 'fs';
+import * as yaml from 'yaml';
 
-let pathToDb: string = '/Users/kjczarne/Library/Containers/com.apple.iBooksX/Data/Documents/AEAnnotation/';
-let fileName: string = 'AEAnnotation_v10312011_1727_local.sqlite';
+let envFile: string = readFileSync('./src/ibooks/env.yaml', 'utf8');
+let envObj: any = yaml.parse(envFile);
+
+let pathToDb: string = envObj.ibooks.db_dir;
+let fileName: string = envObj.ibooks.db_file;
 let fullPath: string = pathToDb + fileName;
+console.log(pathToDb);
 
 let db = new sqlite.Database(fullPath, (err) => {
     if (err) {

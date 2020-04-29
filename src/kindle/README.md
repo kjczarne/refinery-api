@@ -1,0 +1,5 @@
+# Kindle annotations
+
+Kindle annotations on Mac are stored in a plain JSON-like format under `/Users/kjczarne/Library/Containers/com.amazon.Kindle/Data/Library/Application Support/Kindle/My Kindle Content`. Here you will find a bunch of folders, each of which represents a Kindle publication. Each of these is not named by the title but apparently either by ISBN or some hash. In the same folder there is a `sqlite` database named `book_asset.db` that contains some information on the books but apparently nothing that maps titles to the actual publications.
+
+The aforementioned JSON-like files bear the extension of `.mbp` or `.mbpV2` at least on macOS. However, the substantial problem here is that they only store position and do not store the original text fragment from the publication, which needs to be mapped back and extracted from the original book. This may pose a slight reverse-engineering challenge.

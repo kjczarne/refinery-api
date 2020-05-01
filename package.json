@@ -11,7 +11,7 @@
     "adapter": "node ./built/ibooks/adapter.js"
   },
   "author": "kjczarne",
-  "license": "lgpl-3.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "@types/pdfjs-dist": "^2.1.3",
     "@types/puppeteer": "^2.0.1",
@@ -19,6 +19,7 @@
     "core-js": "^3.2.1",
     "pdfjs-dist": "^2.3.200",
     "sqlite3": "^4.2.0",
+    "webpack": "^4.43.0",
     "yaml": "^1.9.2"
   },
   "devDependencies": {

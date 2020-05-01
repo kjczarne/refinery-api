@@ -15,7 +15,7 @@
 
 import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
-import { constructRecord } from '../utils';
+import { constructRecord, convertToMarkdown, convertToHtml } from '../engine';
 import { readFileSync } from 'fs';
 import * as yaml from 'yaml';
 
@@ -25,7 +25,6 @@ let envObj: any = yaml.parse(envFile);
 let pathToDb: string = envObj.ibooks.db_dir;
 let fileName: string = envObj.ibooks.db_file;
 let fullPath: string = pathToDb + fileName;
-console.log(pathToDb);
 
 let db = new sqlite.Database(fullPath, (err) => {
     if (err) {
@@ -34,27 +33,31 @@ let db = new sqlite.Database(fullPath, (err) => {
     console.log('Connected to the iBooks Annotations database.');
 });
 
-let notes: Array<IRecord> = [];
+let records: Array<IRecord> = [];
 
 let sqlQuery: string = `
 SELECT
 ZANNOTATIONNOTE AS note,
 ZANNOTATIONLOCATION AS pagemap,
-ZANNOTATIONREPRESENTATIVETEXT AS origtext
+ZANNOTATIONSELECTEDTEXT AS origtext
 FROM ZAEANNOTATION
 `
 
-// This code is run async:
 db.serialize(() => {
-    db.each(sqlQuery, (err, row) => {
-        if (err) {
-            console.error(err.message);
-        }
-        let record: IRecord = constructRecord("epubcfi", row.pagemap, row.origtext, row.note);
-        notes.push(record);
-        console.log(record);
-    });
-    
+    db.each(
+        sqlQuery, 
+        // this callback processes the rows:
+        (err, row) => {
+            if (err) {
+                console.error(err.message);
+            }
+            let record: IRecord = constructRecord("epubcfi", row.pagemap, row.origtext, row.note);
+            records.push(record);
+        },
+        // this callback runs when the previous operations are finished:
+        (err, count)=>{
+            console.log(records);
+        });
 });
   
 db.close((err) => {
@@ -63,5 +66,3 @@ db.close((err) => {
     }
     console.log('Connection closed successfully.');
 });
-
-

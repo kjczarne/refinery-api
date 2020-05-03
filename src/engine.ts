@@ -1,4 +1,5 @@
 import { IRecord } from './interfaces';
+import * as sqlite from 'sqlite3';
 
 export function constructRecord(
     type: "epubcfi" | "pdf",
@@ -101,4 +102,52 @@ export function convertToFlashcard(
         ["PLACEHOLDER", "PLACEHOLDER\n\n"],
         ["PLACEHOLDER", "PLACEHOLDER\n\n"],
         ["PLACEHOLDER", "PLACEHOLDER\n\n"]);
+}
+
+/**
+ * @function sqlQuery
+ * Queries a `sqlite` database and closes connection
+ * afterwards.
+ * @param db sqlite3.Database
+ * @param sqlQuery Valid SQL query
+ * @returns Promise<Array<any>>
+ */
+export function sqlQueryRun(
+    db: sqlite.Database,
+    sqlQuery: string,
+): Promise<Array<any>>{
+    let rows: Array<any> = new Array<any>();
+    // create Promise as a placeholder for `rows`:
+    let pr: Promise<Array<any>>;
+    pr = new Promise<Array<any>>((resolve, reject)=>{
+        db.serialize(() => {
+            db.each(
+                sqlQuery, 
+                // this callback processes the rows:
+                (err, row) => {
+                    if (err) {
+                        // reject Promise on errors:
+                        reject(err.message);
+                    }
+                        rows.push(row);
+                },
+                // this callback runs when the previous operations are finished:
+                (err, count)=>{
+                    if (err) {
+                        reject(err.message);
+                    }
+                    db.close((err) => {
+                        if (err) {
+                            reject(err.message);
+                        }
+                        else {
+                            console.log('Connection closed successfully.');
+                        }
+                    });
+                    // return the value of `rows` array if the Promise is resolved:
+                    resolve(rows);
+            });
+        });
+    });
+    return pr;
 }

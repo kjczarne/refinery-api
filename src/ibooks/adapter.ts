@@ -1,21 +1,6 @@
-// import * as epub from 'epubjs';
-// import * as puppeteer from 'puppeteer';
-
-// let pathToBook: string = "./res/lorem_ipsum.epub";
-
-// (async () => {
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-//     await page.goto('https://example.com');
-//     await page.screenshot({path: 'example.png'});
-//     let book: epub.Book = new epub.Book(pathToBook);
-//     console.log(book.spine.get(0));
-//     await browser.close();
-//   })();
-
 import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
-import { constructRecord, convertToMarkdown, convertToHtml } from '../engine';
+import { constructRecord, convertToMarkdown, convertToHtml, sqlQueryRun } from '../engine';
 import { readFileSync } from 'fs';
 import * as yaml from 'yaml';
 
@@ -43,26 +28,12 @@ ZANNOTATIONSELECTEDTEXT AS origtext
 FROM ZAEANNOTATION
 `
 
-db.serialize(() => {
-    db.each(
-        sqlQuery, 
-        // this callback processes the rows:
-        (err, row) => {
-            if (err) {
-                console.error(err.message);
-            }
-            let record: IRecord = constructRecord("epubcfi", row.pagemap, row.origtext, row.note);
-            records.push(record);
-        },
-        // this callback runs when the previous operations are finished:
-        (err, count)=>{
-            console.log(records);
-        });
-});
-  
-db.close((err) => {
-    if (err) {
-      console.error(err.message);
+let x = sqlQueryRun(db, sqlQuery);
+
+x.then((response) => {
+    for (let rec of response){
+        let record: IRecord = constructRecord("epubcfi", rec.pagemap, rec.origtext, rec.note);
+        records.push(record);
     }
-    console.log('Connection closed successfully.');
+    console.log(records);
 });

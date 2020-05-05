@@ -5,5 +5,8 @@ export interface IRecord {
     },
     origText: string
     note: string
-    richContent: string
+    richContent: string,
+    guid: string,
+    timestampCreated: number,
+    timestampModified: number
 }

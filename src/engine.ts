@@ -161,7 +161,11 @@ export function convertToFlashcard(
 /**
  * @function sqlQuery
  * Queries a `sqlite` database and closes connection
- * afterwards.
+ * afterwards. Multiple apps make liberal use of `sqlite`
+ * databases, iBooks and Anki for example, thus it makes
+ * sense to encapsulate the steps required for querying
+ * those databases in a function that can be reused
+ * across the whole platform.
  * @param db sqlite3.Database
  * @param sqlQuery Valid SQL query
  * @returns Promise<Array<any>>

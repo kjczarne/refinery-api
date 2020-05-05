@@ -6,7 +6,7 @@ Unit tests will be provided in `mocha` framework with `ts-node` runtime to simpl
 
 Tests will be separated from the original repo and provided as a submodule.
 
-Tests should be written upfront and kept up to date all the time to foster TDD practices.
+Tests should be written upfront and kept up to date all the time to foster TDD practices. However, at this stage it is not possible to fully define tests as this repo is currently a set of experiments to prove the point and then scale out.
 
 In case of problems with `mocha`, refer to the following article: https://journal.artfuldev.com/unit-testing-node-applications-with-typescript-using-mocha-and-chai-384ef05f32b2 
 

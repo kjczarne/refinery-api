@@ -7,8 +7,8 @@
     "start": "node ./built/server.js",
     "build": "tsc -p --pretty",
     "test": "mocha \"./built/tests/*.js\" ",
-    "mantest": "node --inspect-brk=9229 ./built/core/mantest.js",
-    "adapter": "node ./built/ibooks/adapter.js"
+    "mantest": "tsc; node --inspect-brk=9229 ./built/core/mantest.js",
+    "adapter": "tsc; node ./built/ibooks/adapter.js"
   },
   "author": "kjczarne",
   "license": "Apache-2.0",

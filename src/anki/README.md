@@ -9,3 +9,5 @@ Another resource I used liberally in the process was Anki Wiki: https://github.c
 The module attempts to work with a connection to an instance of an Anki Database which can be a DB on your hosted Anki Server of even a local instance that you will then sync through Anki app. It will always attempt to create tables in a connected database if they don't exist already, so that behavior can be adapted to obtain exported `.apkg` files and this is in fact planned for the near future.
 
 This part of the repo is still in very early development stage and README will be updated in the future to accurately describe how to acheive Anki database connection and export generated flashcards there.
+
+Currently the `ibooks/adapter.ts` file contains an example that generates an Anki database in the root folder of this project from iBooks highlights.

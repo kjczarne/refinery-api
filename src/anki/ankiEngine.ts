@@ -9,7 +9,7 @@ import { IRecord } from '../interfaces';
 import { dedent } from 'ts-dedent';
   
 export class AnkiEngine {
-    private _db: sqlite.Database;
+    private _dbPath: string;
     private _deckName: string;
     private _deckId: number;
     private _zip: JSZip = new JSZip();
@@ -17,18 +17,17 @@ export class AnkiEngine {
     private _separator: string = '\u001F';
     private _model: IModel;
 
-    constructor(deckName: string, deckId: number, query: string | Array<string>, sql: sqlite.Database, model: IModel) {
-        this._db = sql;
+    constructor(deckName: string, deckId: number, schema: string, dbPath: string, model: IModel) {
+        this._dbPath = dbPath;
         this._deckName = deckName;
         this._model = model;
         this._deckId = deckId;
-        if (typeof query === 'string') {
-            this._baseQueryHandler(query, false);
+        let splitSchema: Array<string> = schema.split(';\n');
+        for (let i = 0; i<schema.length; i++){
+            splitSchema[i] += ';'
         }
-        else {
-            for (let el of query){
-                this._baseQueryHandler(el, false);
-            }
+        for (let el of splitSchema){
+            this._baseQueryHandler(el);
         }
     }
 
@@ -37,13 +36,13 @@ export class AnkiEngine {
      * responses from the database.
      * @param query Valid SQL query.
      */
-    private _baseQueryHandler(query: string, autoClose: boolean = true){
+    private _baseQueryHandler(query: string){
         let ret: any;
-        sqlQueryRun(this._db, dedent(query).replace(/\n\s+/g, "").replace(/\n/g, ""), autoClose).then(
+        sqlQueryRun(this._dbPath, dedent(query).replace(/\n\s+/g, "").replace(/\n/g, "")).then(
             (response)=>{ret = response;}
         ).catch(
             (reason)=>{console.log(reason);}
-        )
+        );
         return ret;
     }
   
@@ -92,7 +91,7 @@ export class AnkiEngine {
         );
         // the notes table can be safely replaced with new values whether the card already exists or not:
         this._baseQueryHandler(
-            dedent`insert or replace into notes values(
+            `insert or replace into notes values(
                 ${record.timestampCreated},
                 '${record.guid}',
                 ${this._model.id},
@@ -108,7 +107,7 @@ export class AnkiEngine {
         // but the `cards` table should retain most fields unchanged:
         if (suchIdExists){
             this._baseQueryHandler(
-                dedent`update cards
+                `update cards
                 set mod=${nowInSeconds},
                     usn=-1
                 where nid=${record.timestampCreated};`
@@ -116,7 +115,7 @@ export class AnkiEngine {
         }
         else {
             this._baseQueryHandler(
-                dedent`insert into cards values(
+                `insert into cards values(
                     ${record.timestampCreated},
                     ${record.timestampCreated},
                     ${this._deckId},
@@ -155,5 +154,3 @@ export class AnkiEngine {
         return ' ' + tags.map(tag => tag.replace(/ /g, '_')).join(' ') + ' ';
     }
 }
-  
-  

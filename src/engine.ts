@@ -2,6 +2,7 @@ import { IRecord } from './interfaces';
 import * as sqlite from 'sqlite3';
 import { AnkiEngine } from './anki/ankiEngine';
 import sha1 from 'sha1';
+import { delay } from './utils';
 
 /**
  * @function constructRecord Constructs an IRecord Object
@@ -170,10 +171,9 @@ export function convertToFlashcard(
  * @param sqlQuery Valid SQL query
  * @returns Promise<Array<any>>
  */
-export function sqlQueryRun(
+export function sqlQueryHelper(
     db: sqlite.Database,
     sqlQuery: string,
-    autoClose: boolean = true
 ): Promise<Array<any>>{
     let rows: Array<any> = new Array<any>();
     // create Promise as a placeholder for `rows`:
@@ -195,19 +195,6 @@ export function sqlQueryRun(
                     if (err) {
                         reject(err.message);
                     }
-                    if (autoClose){
-                        // sometimes running concurrent queries makes it undesireable
-                        // to automatically close the database, so we let this to be
-                        // an option
-                        db.close((err) => {
-                            if (err) {
-                                reject(err.message);
-                            }
-                            else {
-                                console.log('Connection closed successfully.');
-                            }
-                        });
-                    }
                     // return the value of `rows` array if the Promise is resolved:
                     resolve(rows);
             });
@@ -215,3 +202,65 @@ export function sqlQueryRun(
     });
     return pr;
 }
+
+export function sqlQueryRun(
+    dbPath: string,
+    sqlQuery: string,
+): Promise<Array<any>> {
+    function closeDb(db: sqlite.Database){
+        db.close((err) => {
+            if (err) {
+                console.log(err.message);
+            }
+            else {
+                // console.log('Connection closed successfully.');
+                // TODO: debug logging to a text file with query being stored as well
+            }
+        });
+    }
+    let pr: Promise<Array<any>> = new Promise((resolve, reject)=>{
+        let returnVal: Array<any> = new Array<any>();
+        let db: sqlite.Database = new sqlite.Database(dbPath);
+        sqlQueryHelper(db, sqlQuery).then(
+            (response)=>{
+                closeDb(db);
+                resolve(response);
+            }
+        ).catch(
+            (err)=>{
+                closeDb(db);
+                reject(err.message);
+        });
+    })
+    return pr;
+}
+
+
+/**
+ * @function constructRecords facilitates creation of IRecord objects from a SQL query response
+ * @param responseArrayFromSql an Array of entries returned from a SQL query (Promise response)
+ * @returns Array<IRecord>
+ * Intended pattern of usage:
+ * ```javascript
+ * sqlQueryRun(dbPath, query).then((response)=>{
+ *   constructRecords(response).then((response)=>{
+ *       // do what you need to records here
+ *   });
+ * });
+ * ```
+ */
+export async function constructRecords(
+    responseArrayFromSql: Array<any>
+) {
+    let records: Array<IRecord> = new Array<IRecord>();
+    for (let rec of responseArrayFromSql){
+        await new Promise(async (resolve, reject) => {
+            await delay(1);
+            let record: IRecord  = constructRecord("epubcfi", rec.pagemap, rec.origtext, rec.note);
+            records.push(record);
+            resolve(records);
+        });
+    }
+    return records;
+};
+

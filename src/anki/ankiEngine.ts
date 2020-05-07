@@ -23,7 +23,8 @@ export class AnkiEngine {
         this._model = model;
         this._deckId = deckId;
         let splitSchema: Array<string> = schema.split(';\n');
-        for (let i = 0; i<schema.length; i++){
+        
+        for (let i = 0; i<splitSchema.length; i++){
             splitSchema[i] += ';'
         }
         for (let el of splitSchema){

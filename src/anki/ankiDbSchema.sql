@@ -1,11 +1,10 @@
 -- This has been copied from https://github.com/ankidroid/Anki-Android/wiki/Database-Structure 
--- BEGIN TRANSACTION;
 -- Cards are what you review. 
 -- There can be multiple cards for each note, as determined by the Template.
 CREATE TABLE IF NOT EXISTS cards (
     id              integer primary key,
       -- the epoch milliseconds of when the card was created
-    nid             integer not null,--    
+    nid             integer not null, 
       -- notes.id
     did             integer not null,
       -- deck id (available in col table)
@@ -157,4 +156,4 @@ CREATE INDEX IF NOT EXISTS ix_notes_csum on notes (csum);
 CREATE INDEX IF NOT EXISTS ix_notes_usn on notes (usn);
 CREATE INDEX IF NOT EXISTS ix_revlog_cid on revlog (cid);
 CREATE INDEX IF NOT EXISTS ix_revlog_usn on revlog (usn);
--- COMMIT;
+-- empty comment, do not delete

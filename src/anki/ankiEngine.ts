@@ -20,8 +20,9 @@ function escapeSingleQuotes(str: string | undefined | null){
 }
 
 export class AnkiEngine {
+    public deckName: string;
+
     private _dbPath: string;
-    private _deckName: string;
     private _deckId: number;
     private _zip: JSZip = new JSZip();
     private _media: Map<number, string> = new Map<number, string>();;
@@ -30,7 +31,7 @@ export class AnkiEngine {
 
     constructor(deckName: string, deckId: number, schema: string, dbPath: string, model: IModel) {
         this._dbPath = dbPath;
-        this._deckName = deckName;
+        this.deckName = deckName;
         this._model = model;
         this._deckId = deckId;
         let splitSchema: Array<string> = schema.split(';\n');

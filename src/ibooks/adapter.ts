@@ -1,9 +1,10 @@
 import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
 import { constructRecord, convertToMarkdown, convertToHtml, sqlQueryRun, convertToFlashcard, constructRecords } from '../engine';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import * as yaml from 'yaml';
 import { AnkiEngine } from '../anki/ankiEngine';
+import { AnkiPackager } from '../anki/ankiPackager';
 import { models } from '../anki/ankiObjects';
 import { delay } from '../utils';
 
@@ -29,12 +30,19 @@ let x = sqlQueryRun(fullPath, sqlQuery);
 let db2Path: string = 'sranki.sqlite';
 let schema: string = readFileSync('./src/anki/ankiDbSchema.sql').toString()
 let now: number = Date.now().valueOf();
-let exporter = new AnkiEngine('heck_deck', now, schema, db2Path, models);
+let ankiEngine = new AnkiEngine('heck_deck', now, schema, db2Path, models);
+let ankiPackager = new AnkiPackager(db2Path, '');
 
 x.then((response)=>{
     constructRecords(response).then((response)=>{
         for(let record of response){
-            exporter.addCard(record);
+            ankiEngine.addCard(record);
         }
     })
+}).then(()=>{
+    ankiPackager.pack().then((zipBuffer) => {
+        writeFileSync(`${ankiEngine.deckName}.apkg`, zipBuffer, 'binary');
+        console.log(`Package has been generated: ${ankiEngine.deckName}.apkg`);
+      })
+      .catch((err) => {`Error: console.log(${err.message})`});
 })

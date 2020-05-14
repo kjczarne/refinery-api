@@ -1,4 +1,4 @@
-import { IModel } from './interfaces';
+import { IPModel, IPDconf, IConf, IPDeck } from './interfaces';
 
 let questionFormat = '{{Front}}';
 let answerFormat = '{{FrontSide}}\n\n<hr id="answer">\n\n{{Back}}';
@@ -8,7 +8,7 @@ let css = `.card {\n font-family: arial;
  color: black;\n
  background-color: white;\n}\n`
 
-const conf = {
+export let conf: IConf = {
     nextPos: 1,
     estTimes: true,
     activeDecks: [1],
@@ -24,7 +24,7 @@ const conf = {
     collapseTime: 1200
 };
 
-export const models: IModel = {
+export let models: IPModel = {
     veArs: [],
     name: 'Basic-f15d2',
     tags: ['Tag'],
@@ -67,80 +67,77 @@ export const models: IModel = {
     ],
     latexPost: '\\end{document}',
     type: 0,
-    id: 1388596687391,
+    id: 1388596687391,  // same as in notes.mid, that's how a flashcard is mapped to a given model
     css,
     mod: 1435645658
 };
 
-const decks = {
-    1: {
-        desc: '',
-        name: 'Default',
-        extendRev: 50,
-        usn: 0,
-        collapsed: false,
-        newToday: [0, 0],
-        timeToday: [0, 0],
-        dyn: 0,
-        extendNew: 10,
-        conf: 1,
-        revToday: [0, 0],
-        lrnToday: [0, 0],
-        id: 1,
-        mod: 1435645724
-    },
-    1435588830424: {
-        desc: '',
-        name: 'query',
-        extendRev: 50,
-        usn: -1,
-        collapsed: false,
-        newToday: [545, 0],
-        timeToday: [545, 0],
-        dyn: 0,
-        extendNew: 10,
-        conf: 1,
-        revToday: [545, 0],
-        lrnToday: [545, 0],
-        id: 1435588830424,
-        mod: 1435588830
-    }
+export let decks: IPDeck = {
+    // 1: {
+    //     desc: '',
+    //     name: 'Default',
+    //     extendRev: 50,
+    //     usn: 0,
+    //     collapsed: false,
+    //     newToday: [0, 0],
+    //     timeToday: [0, 0],
+    //     dyn: 0,
+    //     extendNew: 10,
+    //     conf: 1,
+    //     revToday: [0, 0],
+    //     lrnToday: [0, 0],
+    //     id: 1,
+    //     mod: 1435645724
+    // },
+    desc: '',
+    name: 'query',
+    extendRev: 50,
+    usn: -1,
+    collapsed: false,
+    newToday: [545, 0],
+    timeToday: [545, 0],
+    dyn: 0,
+    extendNew: 10,
+    conf: 1,
+    revToday: [545, 0],
+    lrnToday: [545, 0],
+    id: 1435588830424,
+    mod: 1435588830
 };
 
-const dconf = {
-    1: {
+
+export let dconf: IPDconf = {
         name: 'Default',
         replayq: true,
         lapse: {
-        leechFails: 8,
-        minInt: 1,
-        delays: [10],
-        leechAction: 0,
-        mult: 0
+            leechFails: 8,
+            minInt: 1,
+            delays: [10],
+            leechAction: 0,
+            mult: 0
         },
         rev: {
-        perDay: 100,
-        fuzz: 0.05,
-        ivlFct: 1,
-        maxIvl: 36500,
-        ease4: 1.3,
-        bury: true,
-        minSpace: 1
+            perDay: 100,
+            fuzz: 0.05,
+            ivlFct: 1,
+            maxIvl: 36500,
+            ease4: 1.3,
+            bury: true,
+            minSpace: 1
         },
         timer: 0,
         maxTaken: 60,
-        usn: 0,
+        usn: -1,
         new: {
-        perDay: 20,
-        delays: [1, 10],
-        separate: true,
-        ints: [1, 4, 7],
-        initialFactor: 2500,
-        bury: true,
-        order: 1
+            perDay: 20,
+            delays: [1, 10],
+            separate: true,
+            ints: [1, 4, 7],
+            initialFactor: 2500,
+            bury: true,
+            order: 1
         },
         mod: 0,
         id: 1,
         autoplay: true
-    }
 };

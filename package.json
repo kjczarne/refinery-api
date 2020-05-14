@@ -17,6 +17,7 @@
     "@types/puppeteer": "^2.0.1",
     "@types/sha1": "^1.1.2",
     "@types/sqlite3": "^3.1.6",
+    "@types/winston": "^2.4.4",
     "core-js": "^3.2.1",
     "jszip": "^3.4.0",
     "pdfjs-dist": "^2.3.200",
@@ -24,6 +25,7 @@
     "sqlite3": "^4.2.0",
     "ts-dedent": "^1.1.1",
     "webpack": "^4.43.0",
+    "winston": "^3.2.1",
     "yaml": "^1.9.2"
   },
   "devDependencies": {

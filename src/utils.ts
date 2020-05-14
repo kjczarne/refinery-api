@@ -1,8 +1,23 @@
 import * as winston from 'winston';
 import { format } from 'logform';
 
+/**
+ * @function delay basic delay function (async)
+ * @param ms delay in miliseconds
+ */
 export function delay(ms: number){
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * @function mapToJson serializes map to a JSON object
+ * @param map a serializable Map (with string or number keys)
+ */
+export function mapToJson(map: Map<string | number, any>){
+    let obj = Array.from(map).reduce((obj, [key, value]) => (
+        Object.assign(obj, { [key]: value })
+      ), {});
+    return JSON.stringify(obj);
 }
 
 /**

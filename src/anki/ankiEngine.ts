@@ -1,12 +1,15 @@
 // import sha1 from 'sha1';
 import * as sqlite from 'sqlite3';
 import * as fs from 'fs';
+import * as yaml from 'yaml';
 import sha1 = require('sha1');
 import JSZip = require('jszip');
-import { IMediaObject, IModel } from './interfaces';
+import { IMediaObject, IModel, IDeck, IPDeck, IDconf, IPDconf, IPModel, IConf, IYamlConfig } from './interfaces';
 import { sqlQueryRun } from '../engine';
 import { IRecord } from '../interfaces';
 import { dedent } from 'ts-dedent';
+import { conf, models, dconf, decks } from './ankiObjects';
+import { logger } from '../utils';
 
 /**
  * @function escapeSingleQuotes escapes single quotes in a SQL query
@@ -21,21 +24,24 @@ function escapeSingleQuotes(str: string | undefined | null){
 
 export class AnkiEngine {
     public deckName: string;
+    public readonly conf: IYamlConfig
 
     private _dbPath: string;
-    private _deckId: number;
+    private _deck: IPDeck;
     private _zip: JSZip = new JSZip();
     private _media: Map<number, string> = new Map<number, string>();;
     private _separator: string = '\u001F';
-    private _model: IModel;
+    private _model: IPModel;
 
-    constructor(deckName: string, deckId: number, schema: string, dbPath: string, model: IModel) {
+    constructor(deckName: string, deck: IPDeck, schema: string, dbPath: string, model: IPModel) {
         this._dbPath = dbPath;
         this.deckName = deckName;
         this._model = model;
-        this._deckId = deckId;
+        this._deck = deck;
+        let envFile: string = fs.readFileSync('./src/ibooks/env.yaml', 'utf8');
+        this.conf = yaml.parse(envFile);
+
         let splitSchema: Array<string> = schema.split(';\n');
-        
         for (let i = 0; i<splitSchema.length; i++){
             splitSchema[i] += ';'
         }
@@ -43,7 +49,7 @@ export class AnkiEngine {
             let cleanQuery: string = this._queryPrepare(el);
             if (cleanQuery.length > 0){
                 sqlQueryRun(this._dbPath, cleanQuery)
-                .then((response)=>{})
+                .then(()=>{})
                 .catch((err)=>{console.log(`Error ${err} while processing schema creation query: ${el}`)});
             }
         }
@@ -59,6 +65,216 @@ export class AnkiEngine {
                                       .replace(/\n\s+/g, "")   // mush into single line
                                       .replace(/\n/g, "")      // mush into single line
         return cleanQuery;
+    }
+
+    /**
+     * @function updateCollectionTable updates or creates `col` table in Anki database
+     * This function is expected to be called after all cards in the deck have been added.
+     */
+    updateCollectionTable(){ // FIXME: all serialized maps are empty for some reason
+        // ID in col is always 1, there is only one row in this table at all times
+        // the following properties will not be updated in the collection:
+        // * crt -> creation date
+        // * scm -> schema modification time
+        // * ver -> version; superfluous to overwrite each time
+        // * dty -> dirty, unused field which is always 0
+        // * ls -> last sync time (setting usn should be enough)
+        // * conf
+
+        let timestampNow: number = Date.now().valueOf();
+        let now: string = timestampNow.toString();
+        let nowInSeconds: number = parseInt((timestampNow/1000).toString());
+
+        let decksMap: IDeck = new Map<string, IPDeck>();
+        let dconfMap: IDconf = new Map<string, IPDconf>();
+        let modelsMap: IModel = new Map<string, IPModel>();
+        // if ID found in decksMap or dconfMap update these entries, else append to existing array
+        let checkIfExistsQuery: string = `select id from col`
+        let query: string;
+        
+        function idExists(id: string | number, ankiJsonObjMap: IDconf | IDeck | IModel): boolean{
+            // TODO: ankiJsonObjMap.forEach??
+            for (let k in ankiJsonObjMap){
+                let partial: IPDconf | IPDeck | IPModel | undefined = ankiJsonObjMap.get(k);
+                if(partial?.id === id){
+                    return true;
+                } 
+            }
+            return false;
+        }
+
+        function responseToMap(response: any): Map<any, any> {
+            let outMap: Map<any, any> = new Map<any, any>();
+            for (let k in response){
+                outMap.set(k, response[k]);
+            }
+            return outMap;
+        }
+
+        sqlQueryRun(this._dbPath, checkIfExistsQuery).then((response)=>{
+            if (response.length >0){
+                logger.log({
+                    level: "silly",
+                    message: dedent`
+                    Found existing col table, where id: ${response}.
+                    Response from that query should always be a single number
+                    as col table is expected to contain a single row.
+                    `
+                });
+                query = `select models, decks, dconf from col`
+                sqlQueryRun(this._dbPath, query).then((response)=>{
+                    // preserve existing data from the col table:
+                    // TODO: log response
+                    let existingDecksMap: Map<string, IPDeck> = responseToMap(response[0].decks);
+                    let existingDconfMap: Map<string, IPDconf> = responseToMap(response[0].dconf);
+                    let existingModelsMap: Map<string, IPModel> = responseToMap(response[0].models);
+                    existingDecksMap.forEach((v, k)=>{
+                        decksMap.set(k, v);
+                    });
+                    existingDconfMap.forEach((v, k)=>{
+                        dconfMap.set(k, v);
+                    });
+                    existingModelsMap.forEach((v, k)=>{
+                        modelsMap.set(k, v);
+                    });
+                    if(!idExists(this._model.id, existingModelsMap)){
+                        logger.log({
+                            level: "silly",
+                            message: dedent`
+                            Model ID ${this._model.id} doesn't exist in models column, creating...
+                            `
+                        });
+                        modelsMap.set(this._model.id.toString(), this._model);
+                    }
+                    if(!idExists(this._deck.id, existingDecksMap)){
+                        logger.log({
+                            level: "silly",
+                            message: dedent`
+                            Deck ID ${this._deck.id} doesn't exist in decks column, creating...
+                            `
+                        });
+                        let deckObj: IPDeck = {
+                            desc: this._deck.desc,
+                            name: this._deck.name,
+                            extendRev: 50,  // TODO: set these hardcoded values in a YAML instead
+                            usn: -1,
+                            collapsed: false,
+                            newToday: [545, 0],
+                            timeToday: [545, 0],
+                            dyn: 0,
+                            extendNew: 10, // TODO: set these hardcoded values in a YAML instead
+                            conf: 1,       // TODO: set these hardcoded values in a YAML instead
+                            revToday: [545, 0],
+                            lrnToday: [545, 0],
+                            id: this._deck.id,
+                            mod: this._deck.mod
+                        }
+                        decksMap.set(deckObj.id.toString(), deckObj);
+                    }
+                    if(!idExists(this._model.id, existingDconfMap)){
+                        logger.log({
+                            level: "silly",
+                            message: dedent`
+                            Model ID ${this._model.id} doesn't exist in dconf column, creating...
+                            `
+                        });
+                        dconfMap.set(this._model.id.toString(), dconf);
+                    }
+                    query = this._queryPrepare(dedent`
+                        update col set usn=-1,
+                        mod=${timestampNow},
+                        decks='${JSON.stringify(decksMap)}',
+                        dconf='${JSON.stringify(dconfMap)}',
+                        models='${JSON.stringify(modelsMap)}'
+                    `.replace(/\n/g, ""));
+                    sqlQueryRun(this._dbPath, query).then(()=>{
+                        logger.log({
+                            level: "info",
+                            message: dedent`
+                            Collection updated successfully.
+                            `
+                        });
+                        logger.log({
+                            level: "silly",
+                            message: dedent`
+                            Query used for col table update was: ${query}
+                            `
+                        });
+                    }).catch((err)=>{
+                        logger.log({
+                            level: "error",
+                            message: dedent`
+                            Error when running col update query: ${err}
+                            Query used for col table update was: ${query}
+                            `
+                        });
+                    });
+                }).catch((err)=>{
+                    logger.log({
+                        level: "error",
+                        message: dedent`
+                        Error when running col update query: ${err}
+                        Failed on column selection query: ${query}
+                        `
+                    });
+                });
+            }
+            else {
+                //TODO: handle different type of models and fine-grain customization of the decks through JSON Objects                
+                logger.log({
+                    level: "silly",
+                    message: dedent`
+                    No ID found for any existing collection, creating new...
+                    `
+                });
+                dconfMap.set(this._model.id.toString(), dconf);
+                modelsMap.set(this._model.id.toString(), this._model);
+                decksMap.set(this._deck.id.toString(), decks);
+                query = this._queryPrepare(dedent`
+                    insert into col values(
+                        1,
+                        ${nowInSeconds},
+                        ${timestampNow},
+                        ${timestampNow},
+                        14,
+                        0,
+                        -1,
+                        ${timestampNow - 100 /* arbitrary backwards offset */},
+                        '${JSON.stringify(conf)}',
+                        '${JSON.stringify(modelsMap)}',
+                        '${JSON.stringify(decksMap)}',
+                        '${JSON.stringify(dconfMap)}',
+                        '${JSON.stringify({}) /* not supported yet by us */}'
+                    )
+                    `.replace(/\n/g, "")
+                );
+                sqlQueryRun(this._dbPath, query).then(()=>{
+                    logger.log({
+                        level: "info",
+                        message: dedent`
+                        Collection table created successfully.
+                        `
+                    });
+                }).catch((err)=>{
+                    logger.log({
+                        level: "error",
+                        message: dedent`
+                        Error when running col creation query: ${err}
+                        Query used for col table creation was: ${query}
+                        `
+                    });
+                });
+            }
+        }).catch((err)=>{
+            logger.log({
+                level: "error",
+                message: dedent`
+                Error when checking whether col exists: ${err}
+                Query used to check whether col exists: ${query}
+                `
+            });
+        })
+        
     }
   
     addMedia(data: IMediaObject): void {
@@ -87,7 +303,7 @@ export class AnkiEngine {
         
         let timestampNow: number = Date.now().valueOf();
         let now: string = timestampNow.toString();
-        let nowInSeconds: string = parseInt((timestampNow/1000).toString()).toString();
+        let nowInSeconds: number = parseInt((timestampNow/1000).toString());
         
         // TODO: the below logic has to be improved to handle updates
         // values in the `cards` table like reps, factor, lapses, etc.
@@ -97,7 +313,6 @@ export class AnkiEngine {
         // TODO: a direct way of interfacing to the Anki database would be
         // thus more beneficial than just exporting the decks
 
-        // FIXME: seems to run async and yield very different results across runs
         let checkIfExistsQuery: string = `select id from cards where nid=${record.timestampCreated}`
         sqlQueryRun(this._dbPath, checkIfExistsQuery)
             .then(
@@ -123,7 +338,6 @@ export class AnkiEngine {
                             // but the `cards` table should retain most fields unchanged:
                             let cardsTableQuery: string = "";
                             if (response.length > 0){
-                                // console.log("bishhh dat's tru!")
                                 cardsTableQuery = this._queryPrepare(
                                     dedent`update cards
                                     set mod=${nowInSeconds},
@@ -133,11 +347,10 @@ export class AnkiEngine {
                             }
                             else {
                                 cardsTableQuery = this._queryPrepare(
-                                    //FIXME: `replace` liable cards seem to still get through here, ID not unique enough???
                                     dedent`insert into cards values(
                                         ${record.timestampCreated},
                                         ${record.timestampCreated},
-                                        ${this._deckId},
+                                        ${this._deck.id},
                                         ${0},
                                         ${nowInSeconds},
                                         ${-1},

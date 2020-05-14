@@ -9,7 +9,7 @@ import { sqlQueryRun } from '../engine';
 import { IRecord } from '../interfaces';
 import { dedent } from 'ts-dedent';
 import { conf, models, dconf, decks } from './ankiObjects';
-import { logger } from '../utils';
+import { logger, mapToJson } from '../utils';
 
 /**
  * @function escapeSingleQuotes escapes single quotes in a SQL query
@@ -105,8 +105,9 @@ export class AnkiEngine {
 
         function responseToMap(response: any): Map<any, any> {
             let outMap: Map<any, any> = new Map<any, any>();
-            for (let k in response){
-                outMap.set(k, response[k]);
+            let fromJson: any = JSON.parse(response);
+            for (let k in fromJson){
+                outMap.set(k, fromJson[k]);
             }
             return outMap;
         }
@@ -183,9 +184,9 @@ export class AnkiEngine {
                     query = this._queryPrepare(dedent`
                         update col set usn=-1,
                         mod=${timestampNow},
-                        decks='${JSON.stringify(decksMap)}',
-                        dconf='${JSON.stringify(dconfMap)}',
-                        models='${JSON.stringify(modelsMap)}'
+                        decks='${mapToJson(decksMap)}',
+                        dconf='${mapToJson(dconfMap)}',
+                        models='${mapToJson(modelsMap)}'
                     `.replace(/\n/g, ""));
                     sqlQueryRun(this._dbPath, query).then(()=>{
                         logger.log({
@@ -198,6 +199,9 @@ export class AnkiEngine {
                             level: "silly",
                             message: dedent`
                             Query used for col table update was: ${query}
+                            Decks object: ${mapToJson(decksMap)}
+                            Dconf object: ${mapToJson(dconfMap)}
+                            Models object: ${mapToJson(modelsMap)}
                             `
                         });
                     }).catch((err)=>{
@@ -241,9 +245,9 @@ export class AnkiEngine {
                         -1,
                         ${timestampNow - 100 /* arbitrary backwards offset */},
                         '${JSON.stringify(conf)}',
-                        '${JSON.stringify(modelsMap)}',
-                        '${JSON.stringify(decksMap)}',
-                        '${JSON.stringify(dconfMap)}',
+                        '${mapToJson(modelsMap)}',
+                        '${mapToJson(decksMap)}',
+                        '${mapToJson(dconfMap)}',
                         '${JSON.stringify({}) /* not supported yet by us */}'
                     )
                     `.replace(/\n/g, "")

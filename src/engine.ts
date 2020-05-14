@@ -2,7 +2,8 @@ import { IRecord } from './interfaces';
 import * as sqlite from 'sqlite3';
 import { AnkiEngine } from './anki/ankiEngine';
 import sha1 from 'sha1';
-import { delay } from './utils';
+import { delay, logger } from './utils';
+import dedent from 'ts-dedent';
 
 /**
  * @function constructRecord Constructs an IRecord Object
@@ -135,9 +136,9 @@ export function convertToHtml(
   <link rel="stylesheet" href="${cssFile}">\n</head>\n<body>\n`
     htmlCore += convert(record, 
         title,
-        [`  <h1 class=${cssTitleClass}>`, "</h1>\n"],
-        [`    <p class=${cssHighlightClass}>`, "</p>\n"],
-        [`    <p class=${cssNoteClass}>`, "</p>\n\n"]);
+        [`  <h1 class="${cssTitleClass}">`, "</h1>\n"],
+        [`    <p class="${cssHighlightClass}">`, "</p>\n"],
+        [`    <p class="${cssNoteClass}">`, "</p>\n\n"]);
     htmlCore += "</body></html>"
     return htmlCore;
 }
@@ -145,9 +146,7 @@ export function convertToHtml(
 export function convertToFlashcard(
     record: IRecord | Array<IRecord>,
     ankiEngine: AnkiEngine,
-    // deck: string,
-    // cssFront: string,
-    // cssBack: string
+    // deckModel: IModel
 ): void{
     if (isRecord(record)){
         ankiEngine.addCard(record);
@@ -185,6 +184,15 @@ export function sqlQueryHelper(
                 // this callback processes the rows:
                 (err, row) => {
                     if (err) {
+                        // use logger, SQL problems are hard to debug:
+                        logger.log({
+                            level: 'error', 
+                            message: `Error at sqlQueryHelper (pre-response): ${err.message}`
+                        });
+                        logger.log({
+                            level: 'silly',
+                            message: `Query with which sqlQueryHelper was called is: ${sqlQuery}`
+                        });
                         // reject Promise on errors:
                         reject(err.message);
                     }
@@ -193,6 +201,16 @@ export function sqlQueryHelper(
                 // this callback runs when the previous operations are finished:
                 (err, count)=>{
                     if (err) {
+                        logger.log({
+                            level: 'error', 
+                            message: `Error at sqlQueryHelper (post-response): ${err.message}`
+                        });
+                        logger.log({
+                            level: 'silly',
+                            message: dedent`
+                            Query with which sqlQueryHelper was called is: ${sqlQuery}
+                            Response elements number is ${count}`
+                        });
                         reject(err.message);
                     }
                     // return the value of `rows` array if the Promise is resolved:
@@ -210,11 +228,13 @@ export function sqlQueryRun(
     function closeDb(db: sqlite.Database){
         db.close((err) => {
             if (err) {
-                console.log(err.message);
+                logger.log({
+                    level: 'error', 
+                    message: `Error at sqlQueryRun when closing database ${dbPath}: ${err.message}`
+                });  
             }
             else {
-                // console.log('Connection closed successfully.');
-                // TODO: debug logging to a text file with query being stored as well
+                logger.log({level: 'silly', message: 'Connection closed successfully.'});
             }
         });
     }
@@ -224,11 +244,21 @@ export function sqlQueryRun(
         sqlQueryHelper(db, sqlQuery).then(
             (response)=>{
                 closeDb(db);
+                logger.log({
+                    level: 'silly', 
+                    message: `Query: ${sqlQuery} has succesfully returned a response.`
+                });
                 resolve(response);
             }
         ).catch(
             (err)=>{
                 closeDb(db);
+                logger.log({
+                    level: 'error', 
+                    message: dedent`
+                    Error at sqlQueryRun when calling helper: ${err.message}
+                    The query provided was: ${sqlQuery}`
+                });
                 reject(err.message);
         });
     })
@@ -255,7 +285,7 @@ export async function constructRecords(
     let records: Array<IRecord> = new Array<IRecord>();
     for (let rec of responseArrayFromSql){
         await new Promise(async (resolve, reject) => {
-            await delay(1);
+            await delay(2);
             let record: IRecord  = constructRecord("epubcfi", rec.pagemap, rec.origtext, rec.note);
             records.push(record);
             resolve(records);

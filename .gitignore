@@ -1,9 +1,15 @@
 # General
 stash
+debug
 .DS_Store
+.vscode
 
 # Node
 node_modules
 
 # TSC
 built
+
+# Anki
+*.apkg
+*.sqlite

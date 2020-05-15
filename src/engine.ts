@@ -221,6 +221,13 @@ export function sqlQueryHelper(
     return pr;
 }
 
+/**
+ * @function sqlQueryRun 
+ * encapsulates sending a query to a sqlite3 database,
+ * always closes connection afterwards (maximum cleanup)
+ * @param dbPath path to the sqlite3 database
+ * @param sqlQuery valid SQL query
+ */
 export function sqlQueryRun(
     dbPath: string,
     sqlQuery: string,

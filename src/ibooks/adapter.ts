@@ -21,9 +21,9 @@ let fullPath: string = pathToDb + fileName;
 
 let sqlQuery: string = `
 SELECT
-ZANNOTATIONNOTE AS note,
+ZANNOTATIONNOTE AS dataField2,
 ZANNOTATIONLOCATION AS pagemap,
-ZANNOTATIONSELECTEDTEXT AS origtext
+ZANNOTATIONSELECTEDTEXT AS dataField1
 FROM ZAEANNOTATION
 `
 

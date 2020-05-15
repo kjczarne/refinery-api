@@ -11,8 +11,6 @@ import { dedent } from 'ts-dedent';
 import { conf, models, dconf, decks } from './ankiObjects';
 import { logger, mapToJson, queryPrepare, escapeSingleQuotes } from '../utils';
 
-
-
 export class AnkiEgressEngine {
     public deckName: string;
     public readonly conf: IYamlConfig
@@ -276,12 +274,12 @@ export class AnkiEgressEngine {
         let front: string = "";
         let back: string = "";
         if (swapSides){
-            back = record.note;
-            front = record.origText;
+            back = record.dataField2;
+            front = record.dataField1;
         }
         else {
-            front = record.note;
-            back = record.origText;
+            front = record.dataField2;
+            back = record.dataField1;
         }
         
         let timestampNow: number = Date.now().valueOf();

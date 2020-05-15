@@ -1,6 +1,6 @@
 import { IRecord } from './interfaces';
 import * as sqlite from 'sqlite3';
-import { AnkiEngine } from './anki/ankiEgressEngine';
+import { AnkiEgressEngine } from './anki/ankiEgressEngine';
 import sha1 from 'sha1';
 import { delay, logger } from './utils';
 import dedent from 'ts-dedent';
@@ -9,15 +9,15 @@ import dedent from 'ts-dedent';
  * @function constructRecord Constructs an IRecord Object
  * @param type "epubcfi" or "pdf", can be used to map back to origial (pdf not supported yet)
  * @param pageMapValue value of the "epubcfi" or "pdf" mapping
- * @param origText original text that was highlighted
- * @param note note that was added to the original text
+ * @param dataField1 original text that was highlighted
+ * @param dataField2 note that was added to the original text
  * @param richContent map to any rich content that the record should come bundled with
  */
 export function constructRecord(
     type: "epubcfi" | "pdf",
     pageMapValue: string,
-    origText: string,
-    note: string,
+    dataField1: string,
+    dataField2: string,
     richContent: string = ''): IRecord{
         let now: string = Date.now().valueOf().toString();
         let record: IRecord = {
@@ -25,10 +25,10 @@ export function constructRecord(
                 type: type,
                 value: pageMapValue
             },
-            origText: origText,
-            note: note,
+            dataField1: dataField1,
+            dataField2: dataField2,
             richContent: richContent,
-            guid: sha1(`${now}${origText}${note}`),
+            guid: sha1(`${now}${dataField1}${dataField2}`),
             timestampCreated: Date.now().valueOf(),
             timestampModified: Date.now().valueOf()
         }
@@ -41,9 +41,8 @@ export function constructRecord(
  */
 function isRecord(obj: any): obj is IRecord{
     let bools: Array<boolean> = [
-        'pageMap' in obj,
-        'origText' in obj,
-        'note' in obj,
+        'dataField1' in obj,
+        'dataField2' in obj,
         'richContent' in obj,
         'guid' in obj,
         'timestampCreated' in obj,
@@ -60,21 +59,21 @@ function isRecord(obj: any): obj is IRecord{
  * @param record IRecord or an Array of IRecord objects
  * @param title Title of the summary/deck
  * @param wrapTitle Format wrapper for the title
- * @param wrapOrigText Format wrapper for the highlighted text
- * @param wrapNote Format wrapper for the note added
+ * @param wrapDataField1 Format wrapper for the highlighted text
+ * @param wrapDataField2 Format wrapper for the note added
  * @returns string
  */
 export function convert(
     record: IRecord | Array<IRecord>,
     title: string,
     wrapTitle: [string, string],
-    wrapOrigText: [string, string],
-    wrapNote: [string, string]
+    wrapDataField1: [string, string],
+    wrapDataField2: [string, string]
 ){
     let serializedString: string = "";
     // callback to format output string:
     let cb = (x: IRecord, 
-              prop: "origText" | "note",
+              prop: "dataField1" | "dataField2",
               wrapLeft: string, 
               wrapRight: string)=> {
               if (x[prop] != null){
@@ -83,13 +82,13 @@ export function convert(
     }
     serializedString += `${wrapTitle[0]}${title}${wrapTitle[1]}`;
     if (isRecord(record)){
-        cb(record, "origText", wrapOrigText[0], wrapOrigText[1]);
-        cb(record, "note", wrapNote[0], wrapNote[1]);
+        cb(record, "dataField1", wrapDataField1[0], wrapDataField1[1]);
+        cb(record, "dataField2", wrapDataField2[0], wrapDataField2[1]);
     }
     else{
         record.forEach((x)=>{
-            cb(x, "origText", wrapOrigText[0], wrapOrigText[1]);
-            cb(x, "note", wrapNote[0], wrapNote[1]);
+            cb(x, "dataField1", wrapDataField1[0], wrapDataField1[1]);
+            cb(x, "dataField2", wrapDataField2[0], wrapDataField2[1]);
         });
     }
     return serializedString;
@@ -119,8 +118,8 @@ export function convertToMarkdown(
  * @param record IRecord or an Array of IRecord Objects
  * @param title Desired title of the HTML Document
  * @param cssFile CSS file for styling
- * @param cssHighlightClass CSS class bound to Highlight elements
- * @param cssNoteClass CSS class bound to Note elements
+ * @param cssDataField1Class CSS class bound to Highlight elements
+ * @param cssDataField2Class CSS class bound to Note elements
  * @param cssTitleClass CSS class bound to the title
  * @returns string
  */
@@ -128,8 +127,8 @@ export function convertToHtml(
     record: IRecord | Array<IRecord>,
     title: string,
     cssFile: string = 'default.css',
-    cssHighlightClass: string = 'highlight',
-    cssNoteClass: string = 'note',
+    cssDataField1Class: string = 'highlight',
+    cssDataField2Class: string = 'note',
     cssTitleClass: string = 'title'
 ): string{
     let htmlCore: string = `<!DOCTYPE html>\n<html>\n<head>\n  <title>${title}</title>
@@ -137,15 +136,15 @@ export function convertToHtml(
     htmlCore += convert(record, 
         title,
         [`  <h1 class="${cssTitleClass}">`, "</h1>\n"],
-        [`    <p class="${cssHighlightClass}">`, "</p>\n"],
-        [`    <p class="${cssNoteClass}">`, "</p>\n\n"]);
+        [`    <p class="${cssDataField1Class}">`, "</p>\n"],
+        [`    <p class="${cssDataField2Class}">`, "</p>\n\n"]);
     htmlCore += "</body></html>"
     return htmlCore;
 }
 
 export function convertToFlashcard(
     record: IRecord | Array<IRecord>,
-    ankiEngine: AnkiEngine,
+    ankiEngine: AnkiEgressEngine,
     // deckModel: IModel
 ): void{
     if (isRecord(record)){
@@ -293,7 +292,7 @@ export async function constructRecords(
     for (let rec of responseArrayFromSql){
         await new Promise(async (resolve, reject) => {
             await delay(2);
-            let record: IRecord  = constructRecord("epubcfi", rec.pagemap, rec.origtext, rec.note);
+            let record: IRecord  = constructRecord("epubcfi", rec.pagemap, rec.dataField1, rec.dataField2);
             records.push(record);
             resolve(records);
         });

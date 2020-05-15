@@ -3,7 +3,7 @@ import { IRecord } from '../interfaces';
 import { constructRecord, convertToMarkdown, convertToHtml, sqlQueryRun, convertToFlashcard, constructRecords } from '../engine';
 import { readFileSync, writeFileSync } from 'fs';
 import * as yaml from 'yaml';
-import { AnkiEngine } from '../anki/ankiEngine';
+import { AnkiEgressEngine } from '../anki/ankiEgressEngine';
 import { AnkiPackager } from '../anki/ankiPackager';
 import { models } from '../anki/ankiObjects';
 import { IPDeck } from '../anki/interfaces';
@@ -48,7 +48,7 @@ let deck: IPDeck = {
     id: now,  // deck ID
     mod: now
 }
-let ankiEngine = new AnkiEngine('heck_deck', deck, schema, db2Path, models);
+let ankiEngine = new AnkiEgressEngine('heck_deck', deck, schema, db2Path, models);
 let ankiPackager = new AnkiPackager(db2Path, '');
 
 x.then((response)=>{

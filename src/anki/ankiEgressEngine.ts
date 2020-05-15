@@ -22,7 +22,7 @@ function escapeSingleQuotes(str: string | undefined | null){
     else return null;
 }
 
-export class AnkiEngine {
+export class AnkiEgressEngine {
     public deckName: string;
     public readonly conf: IYamlConfig
 

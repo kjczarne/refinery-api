@@ -1,6 +1,6 @@
 import { IRecord } from './interfaces';
 import * as sqlite from 'sqlite3';
-import { AnkiEngine } from './anki/ankiEngine';
+import { AnkiEngine } from './anki/ankiEgressEngine';
 import sha1 from 'sha1';
 import { delay, logger } from './utils';
 import dedent from 'ts-dedent';

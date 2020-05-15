@@ -21,6 +21,28 @@ export function mapToJson(map: Map<string | number, any>){
 }
 
 /**
+ * @function _queryPrepare initially cleans up query string
+ * @param query Valid SQL query.
+ */
+export function queryPrepare(query: string): string{
+    let cleanQuery: string = query.replace(/--.*/g, "")   // remove comments
+                                    .replace(/\n\s+/g, "")   // mush into single line
+                                    .replace(/\n/g, "")      // mush into single line
+    return cleanQuery;
+}
+
+/**
+ * @function escapeSingleQuotes escapes single quotes in a SQL query
+ * @param str SQL query that can possibly contain unescaped single quotes
+ */
+export function escapeSingleQuotes(str: string | undefined | null){
+    if (typeof str === 'string'){
+        return str.replace(/'/g, `''`)
+    }
+    else return null;
+}
+
+/**
  * @constant logger is a Winston Logger used for debugging
  */
 export const logger = winston.createLogger({

@@ -9,18 +9,9 @@ import { sqlQueryRun } from '../engine';
 import { IRecord } from '../interfaces';
 import { dedent } from 'ts-dedent';
 import { conf, models, dconf, decks } from './ankiObjects';
-import { logger, mapToJson } from '../utils';
+import { logger, mapToJson, queryPrepare, escapeSingleQuotes } from '../utils';
 
-/**
- * @function escapeSingleQuotes escapes single quotes in a SQL query
- * @param str SQL query that can possibly contain unescaped single quotes
- */
-function escapeSingleQuotes(str: string | undefined | null){
-    if (typeof str === 'string'){
-        return str.replace(/'/g, `''`)
-    }
-    else return null;
-}
+
 
 export class AnkiEgressEngine {
     public deckName: string;
@@ -46,25 +37,13 @@ export class AnkiEgressEngine {
             splitSchema[i] += ';'
         }
         for (let el of splitSchema){
-            let cleanQuery: string = this._queryPrepare(el);
+            let cleanQuery: string = queryPrepare(el);
             if (cleanQuery.length > 0){
                 sqlQueryRun(this._dbPath, cleanQuery)
                 .then(()=>{})
                 .catch((err)=>{console.log(`Error ${err} while processing schema creation query: ${el}`)});
             }
         }
-    }
-
-    /**
-     * @function _queryPrepare initially cleans up query string
-     * @param query Valid SQL query.
-     */
-    private _queryPrepare(query: string): string{
-        // let ret: any;
-        let cleanQuery: string = query.replace(/--.*/g, "")   // remove comments
-                                      .replace(/\n\s+/g, "")   // mush into single line
-                                      .replace(/\n/g, "")      // mush into single line
-        return cleanQuery;
     }
 
     /**
@@ -181,7 +160,7 @@ export class AnkiEgressEngine {
                         });
                         dconfMap.set(this._model.id.toString(), dconf);
                     }
-                    query = this._queryPrepare(dedent`
+                    query = queryPrepare(dedent`
                         update col set usn=-1,
                         mod=${timestampNow},
                         decks='${mapToJson(decksMap)}',
@@ -234,7 +213,7 @@ export class AnkiEgressEngine {
                 dconfMap.set(this._model.id.toString(), dconf);
                 modelsMap.set(this._model.id.toString(), this._model);
                 decksMap.set(this._deck.id.toString(), decks);
-                query = this._queryPrepare(dedent`
+                query = queryPrepare(dedent`
                     insert into col values(
                         1,
                         ${nowInSeconds},
@@ -322,7 +301,7 @@ export class AnkiEgressEngine {
             .then(
                 (response)=>{
                     // the notes table can be safely replaced with new values whether the card already exists or not:
-                    let notesTableInsertQuery: string = this._queryPrepare(
+                    let notesTableInsertQuery: string = queryPrepare(
                         dedent`insert or replace into notes values(
                             ${record.timestampCreated},
                             '${record.guid}',
@@ -342,7 +321,7 @@ export class AnkiEgressEngine {
                             // but the `cards` table should retain most fields unchanged:
                             let cardsTableQuery: string = "";
                             if (response.length > 0){
-                                cardsTableQuery = this._queryPrepare(
+                                cardsTableQuery = queryPrepare(
                                     dedent`update cards
                                     set mod=${nowInSeconds},
                                         usn=-1
@@ -350,7 +329,7 @@ export class AnkiEgressEngine {
                                 );
                             }
                             else {
-                                cardsTableQuery = this._queryPrepare(
+                                cardsTableQuery = queryPrepare(
                                     dedent`insert into cards values(
                                         ${record.timestampCreated},
                                         ${record.timestampCreated},

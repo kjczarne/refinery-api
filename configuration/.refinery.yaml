@@ -1,0 +1,17 @@
+refinery:
+  database:
+    databaseServer: 'http://localhost:5984/'
+    databaseName: 'refinerydb'
+    user: admin
+    password: password
+  adapterConfig:
+    iBooks2Anki:
+      ankiDb: 'sranki.sqlite'
+      deckConfig: 'default'
+      algorithmConfig: 'default'
+ibooks:
+  annotationsDb: "./tests/res/ibooks/ibooks_db_mock.sqlite"
+  libraryDb: "./tests/res/ibooks/ibooks_library_mock.sqlite"
+anki:
+  deckConfig: default
+  algorithmConfig: default

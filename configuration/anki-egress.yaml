@@ -1,0 +1,39 @@
+# This YAML configures the characteristics
+# of decks and cards produced by the AnkiEngine
+# Explanation of the format used is in the src/anki/README.md
+anki:
+  deckConfigs:
+    - cfgId: default
+      extendRev: 50
+      extendNew: 10
+      dyn: 0
+      conf: 1
+    # - cfgId: custom
+  algorithmConfigs:
+    - cfgId: default
+      lapse:
+        leechFails: 8
+        minInt: 1
+        delays: [10]
+        leechAction: 0
+        mult: 0
+      rev: 
+        perDay: 100
+        fuzz: 0.05
+        ivlFct: 1
+        maxIvl: 36500
+        ease4: 1.3
+        bury: true
+        minSpace: 1
+      timer: 0
+      maxTaken: 60
+      new:
+        perDay: 20
+        delays: [1, 10]
+        ints: [1, 4, 7]
+        initialFactor: 2500
+        bury: true
+        order: 1
+      autoplay: true
+      replayq: true
+    # - cfgId: custom

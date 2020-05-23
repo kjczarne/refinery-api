@@ -126,7 +126,7 @@ export interface IPDeck {
 export type IPPDeck = Pick<IPDeck, 'desc' | 'name' | 'mod' | 'id'>
 
 /**
- * @type IDeck defines a map: modelId -> IPDeck
+ * @type IDeck defines a map: deckId -> IPDeck
  */
 export type IDeck = Map<string, IPDeck>
 

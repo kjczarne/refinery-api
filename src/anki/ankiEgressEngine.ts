@@ -1,11 +1,10 @@
 // import sha1 from 'sha1';
-import * as sqlite from 'sqlite3';
 import * as fs from 'fs';
 import * as yaml from 'yaml';
 import sha1 = require('sha1');
 import JSZip = require('jszip');
 import { IMediaObject, IModel, IDeck, IPDeck, IDconf, IPDconf, IPModel, IConf, IYamlConfig } from './interfaces';
-import { sqlQueryRun } from '../engine';
+import { sqlQueryRun, sqlSchema } from '../engine';
 import { IRecord } from '../interfaces';
 import { dedent } from 'ts-dedent';
 import { conf, models, dconf, decks } from './ankiObjects';
@@ -17,38 +16,29 @@ export class AnkiEgressEngine {
 
     private _dbPath: string;
     private _deck: IPDeck;
-    private _zip: JSZip = new JSZip();
     private _media: Map<number, string> = new Map<number, string>();;
     private _separator: string = '\u001F';
     private _model: IPModel;
 
-    constructor(deckName: string, deck: IPDeck, schema: string, dbPath: string, model: IPModel) {
+    constructor(deckName: string, schema: string, dbPath: string, deckConfigId?: string, modelConfigId?: string) {
         this._dbPath = dbPath;
         this.deckName = deckName;
-        this._model = model;
-        this._deck = deck;
-        let envFile: string = fs.readFileSync('./src/ibooks/env.yaml', 'utf8');
-        this.conf = yaml.parse(envFile);
-
-        let splitSchema: Array<string> = schema.split(';\n');
-        for (let i = 0; i<splitSchema.length; i++){
-            splitSchema[i] += ';'
-        }
-        for (let el of splitSchema){
-            let cleanQuery: string = queryPrepare(el);
-            if (cleanQuery.length > 0){
-                sqlQueryRun(this._dbPath, cleanQuery)
-                .then(()=>{})
-                .catch((err)=>{console.log(`Error ${err} while processing schema creation query: ${el}`)});
-            }
-        }
+        this.conf = yaml.parse(fs.readFileSync('./configuration/anki-egress.yaml', 'utf8'));
+        sqlSchema(this._dbPath, schema);
+        let partialDeckCfgFromId = this.conf.anki.deckConfigs.find((el)=>{el.cfgId === deckConfigId});
+        let partialModelCfgFromId = this.conf.anki.algorithmConfigs.find((el)=>{el.cfgId === modelConfigId});
+        this._model = models;
+        this._deck = decks;
+        // use Object.assing(target, source) to transfer properties from YAML config onto template objects:
+        Object.assign(this._model, partialModelCfgFromId);
+        Object.assign(this._deck, partialDeckCfgFromId);
     }
 
     /**
      * @function updateCollectionTable updates or creates `col` table in Anki database
      * This function is expected to be called after all cards in the deck have been added.
      */
-    updateCollectionTable(){ // FIXME: all serialized maps are empty for some reason
+    updateCollectionTable(){
         // ID in col is always 1, there is only one row in this table at all times
         // the following properties will not be updated in the collection:
         // * crt -> creation date
@@ -102,7 +92,6 @@ export class AnkiEgressEngine {
                 query = `select models, decks, dconf from col`
                 sqlQueryRun(this._dbPath, query).then((response)=>{
                     // preserve existing data from the col table:
-                    // TODO: log response
                     let existingDecksMap: Map<string, IPDeck> = responseToMap(response[0].decks);
                     let existingDconfMap: Map<string, IPDconf> = responseToMap(response[0].dconf);
                     let existingModelsMap: Map<string, IPModel> = responseToMap(response[0].models);
@@ -131,23 +120,7 @@ export class AnkiEgressEngine {
                             Deck ID ${this._deck.id} doesn't exist in decks column, creating...
                             `
                         });
-                        let deckObj: IPDeck = {
-                            desc: this._deck.desc,
-                            name: this._deck.name,
-                            extendRev: 50,  // TODO: set these hardcoded values in a YAML instead
-                            usn: -1,
-                            collapsed: false,
-                            newToday: [545, 0],
-                            timeToday: [545, 0],
-                            dyn: 0,
-                            extendNew: 10, // TODO: set these hardcoded values in a YAML instead
-                            conf: 1,       // TODO: set these hardcoded values in a YAML instead
-                            revToday: [545, 0],
-                            lrnToday: [545, 0],
-                            id: this._deck.id,
-                            mod: this._deck.mod
-                        }
-                        decksMap.set(deckObj.id.toString(), deckObj);
+                        decksMap.set(this._deck.id.toString(), this._deck);
                     }
                     if(!idExists(this._model.id, existingDconfMap)){
                         logger.log({
@@ -302,7 +275,7 @@ export class AnkiEgressEngine {
                     let notesTableInsertQuery: string = queryPrepare(
                         dedent`insert or replace into notes values(
                             ${record.timestampCreated},
-                            '${record.guid}',
+                            '${record._id}',
                             ${this._model.id},
                             ${now},
                             ${-1},
@@ -311,8 +284,8 @@ export class AnkiEgressEngine {
                             '${escapeSingleQuotes(front)}',
                             ${this._checksum(escapeSingleQuotes(front + this._separator + back))},
                             ${0},
-                            'empty');`.replace(/\n/g, "")
-                            // TODO: data field is unused, can be used to store IRecords and reverse-import Anki Decks
+                            '${JSON.stringify(record.pageMap)}');`.replace(/\n/g, "")
+                            // data field is unused, can be used to store IRecords and reverse-import Anki Decks
                     );
                     sqlQueryRun(this._dbPath, notesTableInsertQuery)
                         .then((responseL2)=>{

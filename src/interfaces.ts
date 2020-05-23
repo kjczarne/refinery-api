@@ -1,4 +1,17 @@
 /**
+ * @interface IPageMap
+ * describes the interface for mapping extracted data to original source
+ * allowing their back-referencing.
+ * 
+ * Any module serializing this interface must clearly define the ingress
+ * and egress behavior independently.
+ */
+export interface IPageMap {
+    pagemapType?: "epubcfi" | "pdf"  // modifiable, can allow additional types
+    pagemapValue?: string
+}
+
+/**
  * @interface IRecord
  * describes main piece of data thet is going to be handled by Refinery.
  * 
@@ -14,12 +27,12 @@ export interface IRecord {
     [x: string]: any,
     dataField1: string,
     dataField2: string,
-    guid: string,
-    richContent: string,
+    _id: string,
+    _rev?: string,
+    richContent?: string,
     timestampCreated: number,
     timestampModified: number,
-    pageMap?: {
-        type: "epubcfi" | "pdf"  // modifiable, can allow additional types
-        value: string
-    }
+    pageMap?: IPageMap,
+    source: string
 }
+

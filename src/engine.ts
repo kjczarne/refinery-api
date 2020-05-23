@@ -1,34 +1,36 @@
-import { IRecord } from './interfaces';
+import { IRecord, IPageMap } from './interfaces';
 import * as sqlite from 'sqlite3';
 import { AnkiEgressEngine } from './anki/ankiEgressEngine';
 import sha1 from 'sha1';
-import { delay, logger } from './utils';
+import { delay, logger, queryPrepare } from './utils';
 import dedent from 'ts-dedent';
+import * as yaml from 'yaml';
+import { readFileSync } from 'fs';
+import nano from 'nano';
 
 /**
  * @function constructRecord Constructs an IRecord Object
  * @param type "epubcfi" or "pdf", can be used to map back to origial (pdf not supported yet)
- * @param pageMapValue value of the "epubcfi" or "pdf" mapping
+ * @param pagemapValue value of the "epubcfi" or "pdf" mapping
  * @param dataField1 original text that was highlighted
  * @param dataField2 note that was added to the original text
+ * @param source describes the source of the original record
  * @param richContent map to any rich content that the record should come bundled with
  */
 export function constructRecord(
-    type: "epubcfi" | "pdf",
-    pageMapValue: string,
     dataField1: string,
     dataField2: string,
+    source: string,
+    pageMap?: IPageMap,
     richContent: string = ''): IRecord{
         let now: string = Date.now().valueOf().toString();
         let record: IRecord = {
-            pageMap: {
-                type: type,
-                value: pageMapValue
-            },
+            pageMap: pageMap,
             dataField1: dataField1,
             dataField2: dataField2,
+            source: source,
             richContent: richContent,
-            guid: sha1(`${now}${dataField1}${dataField2}`),
+            _id: sha1(`${now}${dataField1}${dataField2}`),
             timestampCreated: Date.now().valueOf(),
             timestampModified: Date.now().valueOf()
         }
@@ -271,6 +273,23 @@ export function sqlQueryRun(
     return pr;
 }
 
+export function sqlSchema(dbPath: string, schema: string){
+    let splitSchema: Array<string> = schema.split(';\n');
+    let pr: Promise<void> = new Promise<void>(()=>{
+        for (let i = 0; i<splitSchema.length; i++){
+            splitSchema[i] += ';'
+        }
+        for (let el of splitSchema){
+            let cleanQuery: string = queryPrepare(el);
+            if (cleanQuery.length > 0){
+                sqlQueryRun(dbPath, cleanQuery)
+                .then(()=>{})
+                .catch((err)=>{console.log(`Error ${err} while processing schema creation query: ${el}`)});
+            }
+        }
+    });
+    return pr;
+}
 
 /**
  * @function constructRecords facilitates creation of IRecord objects from a SQL query response
@@ -286,17 +305,68 @@ export function sqlQueryRun(
  * ```
  */
 export async function constructRecords(
-    responseArrayFromSql: Array<any>
+    responseArrayFromSql: Array<IRecord>
 ) {
     let records: Array<IRecord> = new Array<IRecord>();
     for (let rec of responseArrayFromSql){
         await new Promise(async (resolve, reject) => {
             await delay(2);
-            let record: IRecord  = constructRecord("epubcfi", rec.pagemap, rec.dataField1, rec.dataField2);
+            let record: IRecord  = constructRecord(
+                rec.dataField1, 
+                rec.dataField2,
+                rec.source,
+                rec.pageMap,
+                rec.richContent
+            );
             records.push(record);
             resolve(records);
         });
     }
     return records;
 };
+
+export class RefineryDatabaseWrapper {
+    config: any;
+    // server: nano.ServerScope;
+    server: nano.ServerScope;
+    auth: Promise<nano.DatabaseAuthResponse>;
+    db: nano.DocumentScope<unknown> | undefined;
+
+    constructor(configPath: string = './configuration/.refinery.yaml'){
+        this.config = yaml.parse(readFileSync(configPath, 'utf8'));
+        // TODO: more secure handling of the database authentication:
+        this.server = nano({
+            url: this.config.refinery.database.databaseServer, 
+            requestDefaults: {jar:true}  // enables cookie authentication
+        });
+        this.auth = this.server.auth(
+            this.config.refinery.database.user, 
+            this.config.refinery.database.password
+        );
+        this.auth.then(()=>{
+            this.server.db.create(this.config.refinery.database.databaseName).then(()=>{
+                logger.log({
+                    level: 'info',
+                    message: `Refinery DB created under ${this.config.refinery.database.databaseServer}`
+                });
+                this.db = this.server.db.use(this.config.refinery.databaseName);
+            }).catch((err)=>{
+                logger.log({
+                    level: "error",
+                    message: dedent`
+                    Error creating Refinery Database: ${err}.
+                    `
+                });
+            });
+        }).catch((err)=>{
+            logger.log({
+                level: "error",
+                message: dedent`
+                Authentication for user ${this.config.refinery.database.user} failed!
+                Error thrown: ${err}
+                `
+            });
+        });
+    }
+}
 

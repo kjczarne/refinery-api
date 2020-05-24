@@ -7,7 +7,7 @@ import { dedent } from 'ts-dedent';
 import { AppleiBooksEngine } from '../ibooks/iBooksEngine';
 import { iBooks2AnkiFunction } from './interfaces';
 
-let def: iBooks2AnkiFunction = (
+let f: iBooks2AnkiFunction = (
     bookName: string,
     deckName: string, 
     apkgPath?: string
@@ -77,4 +77,4 @@ let def: iBooks2AnkiFunction = (
     
 }
 
-export default def;
+export default f;

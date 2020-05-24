@@ -1,8 +1,8 @@
 import { logger } from '../utils';
 import { AppleiBooksEngine } from '../ibooks/iBooksEngine';
-import { iBooks2AnkiFunction } from './interfaces';
+import { iBooks2RefineryFunction } from './interfaces';
 
-let f: iBooks2AnkiFunction = (
+let f: iBooks2RefineryFunction = (
     bookName: string
 )=>{
     let iBooksEngine: AppleiBooksEngine = new AppleiBooksEngine();

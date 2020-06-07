@@ -131,13 +131,13 @@ export class AnkiEgressEngine {
                         });
                         dconfMap.set(this._model.id.toString(), dconf);
                     }
-                    query = queryPrepare(dedent`
+                    query = dedent`
                         update col set usn=-1,
                         mod=${timestampNow},
                         decks='${mapToJson(decksMap)}',
                         dconf='${mapToJson(dconfMap)}',
                         models='${mapToJson(modelsMap)}'
-                    `.replace(/\n/g, ""));
+                    `.replace(/\n/g, "");
                     sqlQueryRun(this._dbPath, query).then(()=>{
                         logger.log({
                             level: "info",
@@ -184,7 +184,7 @@ export class AnkiEgressEngine {
                 dconfMap.set(this._model.id.toString(), dconf);
                 modelsMap.set(this._model.id.toString(), this._model);
                 decksMap.set(this._deck.id.toString(), decks);
-                query = queryPrepare(dedent`
+                query = dedent`
                     insert into col values(
                         1,
                         ${nowInSeconds},
@@ -200,8 +200,7 @@ export class AnkiEgressEngine {
                         '${mapToJson(dconfMap)}',
                         '${JSON.stringify({}) /* not supported yet by us */}'
                     )
-                    `.replace(/\n/g, "")
-                );
+                    `.replace(/\n/g, "");
                 sqlQueryRun(this._dbPath, query).then(()=>{
                     logger.log({
                         level: "info",
@@ -272,8 +271,7 @@ export class AnkiEgressEngine {
             .then(
                 (response)=>{
                     // the notes table can be safely replaced with new values whether the card already exists or not:
-                    let notesTableInsertQuery: string = queryPrepare(
-                        dedent`insert or replace into notes values(
+                    let notesTableInsertQuery: string = dedent`insert or replace into notes values(
                             ${record.timestampCreated},
                             '${record._id}',
                             ${this._model.id},
@@ -284,23 +282,21 @@ export class AnkiEgressEngine {
                             '${escapeSingleQuotes(front)}',
                             ${this._checksum(escapeSingleQuotes(front + this._separator + back))},
                             ${0},
-                            '${JSON.stringify(record.pageMap)}');`.replace(/\n/g, "")
+                            '${JSON.stringify(record.pageMap)}');`.replace(/\n/g, "");
                             // data field is unused, can be used to store IRecords and reverse-import Anki Decks
-                    );
                     sqlQueryRun(this._dbPath, notesTableInsertQuery)
                         .then((responseL2)=>{
                             // but the `cards` table should retain most fields unchanged:
                             let cardsTableQuery: string = "";
                             if (response.length > 0){
-                                cardsTableQuery = queryPrepare(
+                                cardsTableQuery = 
                                     dedent`update cards
                                     set mod=${nowInSeconds},
                                         usn=-1
-                                    where nid=${record.timestampCreated};`.replace(/\n/g, "")
-                                );
+                                    where nid=${record.timestampCreated};`.replace(/\n/g, "");
                             }
                             else {
-                                cardsTableQuery = queryPrepare(
+                                cardsTableQuery = 
                                     dedent`insert into cards values(
                                         ${record.timestampCreated},
                                         ${record.timestampCreated},
@@ -319,8 +315,7 @@ export class AnkiEgressEngine {
                                         ${0},
                                         ${0},
                                         ${0},
-                                        'empty');`.replace(/\n/g, "")
-                                );
+                                        'empty');`.replace(/\n/g, "");
                             }
                             sqlQueryRun(this._dbPath, cardsTableQuery)
                                 .then((responseL3)=>{console.log(`Flashcard ${record.timestampCreated} added`)})

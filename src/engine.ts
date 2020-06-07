@@ -1,12 +1,12 @@
 import { IRecord, IPageMap } from './interfaces';
-import * as sqlite from 'sqlite3';
+import * as sqlite from 'better-sqlite3';
 import { AnkiEgressEngine } from './anki/ankiEgressEngine';
 import sha1 from 'sha1';
 import { delay, logger, queryPrepare } from './utils';
 import dedent from 'ts-dedent';
 import * as yaml from 'yaml';
 import { readFileSync } from 'fs';
-import nano from 'nano';
+import nano, { DocumentScope } from 'nano';
 
 /**
  * @function constructRecord Constructs an IRecord Object
@@ -174,50 +174,37 @@ export function convertToFlashcard(
 export function sqlQueryHelper(
     db: sqlite.Database,
     sqlQuery: string,
+    mode: 'get' | 'run' = 'get'
 ): Promise<Array<any>>{
     let rows: Array<any> = new Array<any>();
     // create Promise as a placeholder for `rows`:
     let pr: Promise<Array<any>>;
     pr = new Promise<Array<any>>((resolve, reject)=>{
-        db.serialize(() => {
-            db.each(
-                sqlQuery, 
-                // this callback processes the rows:
-                (err, row) => {
-                    if (err) {
-                        // use logger, SQL problems are hard to debug:
-                        logger.log({
-                            level: 'error', 
-                            message: `Error at sqlQueryHelper (pre-response): ${err.message}`
-                        });
-                        logger.log({
-                            level: 'silly',
-                            message: `Query with which sqlQueryHelper was called is: ${sqlQuery}`
-                        });
-                        // reject Promise on errors:
-                        reject(err.message);
-                    }
-                        rows.push(row);
-                },
-                // this callback runs when the previous operations are finished:
-                (err, count)=>{
-                    if (err) {
-                        logger.log({
-                            level: 'error', 
-                            message: `Error at sqlQueryHelper (post-response): ${err.message}`
-                        });
-                        logger.log({
-                            level: 'silly',
-                            message: dedent`
-                            Query with which sqlQueryHelper was called is: ${sqlQuery}
-                            Response elements number is ${count}`
-                        });
-                        reject(err.message);
-                    }
-                    // return the value of `rows` array if the Promise is resolved:
-                    resolve(rows);
+        try {
+            if (mode == 'get'){
+                let responseRows = db.prepare(sqlQuery).all()
+                for (let row of responseRows){
+                    rows.push(row);
+                }
+            }
+            else if (mode == 'run'){
+                db.prepare(sqlQuery).run()
+            }
+            
+            resolve(rows);
+        }
+        catch(err){
+            // use logger, SQL problems are hard to debug:
+            logger.log({
+                level: 'error', 
+                message: `Error at sqlQueryHelper (pre-response): ${err.message}`
             });
-        });
+            logger.log({
+                level: 'silly',
+                message: `Query with which sqlQueryHelper was called is: ${sqlQuery}`
+            });
+            reject(err.message);
+        }
     });
     return pr;
 }
@@ -232,24 +219,24 @@ export function sqlQueryHelper(
 export function sqlQueryRun(
     dbPath: string,
     sqlQuery: string,
+    mode: 'get' | 'run' = 'get'
 ): Promise<Array<any>> {
     function closeDb(db: sqlite.Database){
-        db.close((err) => {
-            if (err) {
-                logger.log({
-                    level: 'error', 
-                    message: `Error at sqlQueryRun when closing database ${dbPath}: ${err.message}`
-                });  
-            }
-            else {
-                logger.log({level: 'silly', message: 'Connection closed successfully.'});
-            }
-        });
+        try {
+            db.close();
+            logger.log({level: 'silly', message: 'Connection closed successfully.'});
+        }
+        catch(err){
+            logger.log({
+                level: 'error', 
+                message: `Error at sqlQueryRun when closing database ${dbPath}: ${err.message}`
+            });
+        }
     }
     let pr: Promise<Array<any>> = new Promise((resolve, reject)=>{
         let returnVal: Array<any> = new Array<any>();
-        let db: sqlite.Database = new sqlite.Database(dbPath);
-        sqlQueryHelper(db, sqlQuery).then(
+        let db: sqlite.Database = new sqlite.default(dbPath);
+        sqlQueryHelper(db, sqlQuery, mode).then(
             (response)=>{
                 closeDb(db);
                 logger.log({
@@ -274,19 +261,44 @@ export function sqlQueryRun(
 }
 
 export function sqlSchema(dbPath: string, schema: string){
-    let splitSchema: Array<string> = schema.split(';\n');
-    let pr: Promise<void> = new Promise<void>(()=>{
+    //FIXME: This stupid function is still a problem
+    let cleanSchema: string = queryPrepare(schema)
+    let splitSchema: Array<string> = cleanSchema.split(';');
+    // pop last, because we don't expect any valid query after the last `;` char:
+    splitSchema.pop();
+    let promiseChain: Array<Promise<any>> = new Array<Promise<any>>();
+    let pr: Promise<void> = new Promise<void>(async (resolve, reject)=>{
+        // put back `;` onto each element of the array with a trailing space for safety
         for (let i = 0; i<splitSchema.length; i++){
-            splitSchema[i] += ';'
-        }
-        for (let el of splitSchema){
-            let cleanQuery: string = queryPrepare(el);
-            if (cleanQuery.length > 0){
-                sqlQueryRun(dbPath, cleanQuery)
-                .then(()=>{})
-                .catch((err)=>{console.log(`Error ${err} while processing schema creation query: ${el}`)});
+            if (splitSchema[i].length > 1){
+                splitSchema[i] += '; '
+                promiseChain.push(sqlQueryRun(dbPath, splitSchema[i], 'run'));
             }
         }
+        async function awaitSequence(
+            arrayOfPromises: Array<Promise<any>>,
+        ){
+            let responses = Array<any>();
+            for (let i =0; i<arrayOfPromises.length; i++) {
+                try {
+                    responses.push(await arrayOfPromises[i]);
+                    logger.log({
+                        level: 'silly',
+                        message: `Successful schema query: ${splitSchema[i]}`
+                    });
+                }
+                catch(err){
+                    logger.log({
+                        level: 'error',
+                        message: `Error ${err} while processing schema creation query: ${splitSchema[i]}`
+                    });
+                    reject();
+                }
+            }
+            resolve();
+            return responses;
+        }
+        awaitSequence(promiseChain);
     });
     return pr;
 }
@@ -327,46 +339,23 @@ export async function constructRecords(
 
 export class RefineryDatabaseWrapper {
     config: any;
-    // server: nano.ServerScope;
-    server: nano.ServerScope;
     auth: Promise<nano.DatabaseAuthResponse>;
-    db: nano.DocumentScope<unknown> | undefined;
+    server: nano.DatabaseScope;
+    db: DocumentScope<unknown>;
 
     constructor(configPath: string = './configuration/.refinery.yaml'){
         this.config = yaml.parse(readFileSync(configPath, 'utf8'));
         // TODO: more secure handling of the database authentication:
-        this.server = nano({
-            url: this.config.refinery.database.databaseServer, 
-            requestDefaults: {jar:true}  // enables cookie authentication
-        });
-        this.auth = this.server.auth(
-            this.config.refinery.database.user, 
-            this.config.refinery.database.password
-        );
-        this.auth.then(()=>{
-            this.server.db.create(this.config.refinery.database.databaseName).then(()=>{
-                logger.log({
-                    level: 'info',
-                    message: `Refinery DB created under ${this.config.refinery.database.databaseServer}`
-                });
-                this.db = this.server.db.use(this.config.refinery.databaseName);
-            }).catch((err)=>{
-                logger.log({
-                    level: "error",
-                    message: dedent`
-                    Error creating Refinery Database: ${err}.
-                    `
-                });
-            });
-        }).catch((err)=>{
-            logger.log({
-                level: "error",
-                message: dedent`
-                Authentication for user ${this.config.refinery.database.user} failed!
-                Error thrown: ${err}
-                `
-            });
-        });
+        const couchDb = nano(
+            {url: this.config.refinery.database.databaseServer, requestDefaults: {jar:true}}
+        ),
+            username = this.config.refinery.database.user,
+            userpass = this.config.refinery.database.password,
+            server = couchDb.db,
+            db = couchDb.db.use(this.config.refinery.database.databaseName);
+        this.auth = couchDb.auth(username, userpass);
+        this.server = server;
+        this.db = db;
     }
 }
 

@@ -156,4 +156,3 @@ CREATE INDEX IF NOT EXISTS ix_notes_csum on notes (csum);
 CREATE INDEX IF NOT EXISTS ix_notes_usn on notes (usn);
 CREATE INDEX IF NOT EXISTS ix_revlog_cid on revlog (cid);
 CREATE INDEX IF NOT EXISTS ix_revlog_usn on revlog (usn);
--- empty comment, do not delete, necessary for cleaning functions to work properly

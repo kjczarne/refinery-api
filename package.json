@@ -6,20 +6,29 @@
   "scripts": {
     "start": "node ./built/server.js",
     "build": "tsc",
-    "test": "mocha \"./built/tests/*.js\" ",
-    "mantest": "tsc; node --inspect-brk=9229 ./built/ibooks/adapter.js",
+    "test": "rm ./debug/combined.log; rm ./debug/error.log; tsc; mocha --package ./package.json \"./tests/**/*.ts\"",
+    "mantest": "tsc; node --inspect-brk=9229 ./built/src/mantest.js",
     "adapter": "tsc; node ./built/ibooks/adapter.js",
     "refine": "node ./built/controller.js"
+  },
+  "mocha": {
+    "timeout": 5000,
+    "recursive": true,
+    "require": [
+      "ts-node/register"
+    ]
   },
   "author": "kjczarne",
   "license": "Apache-2.0",
   "dependencies": {
+    "@types/better-sqlite3": "^5.4.0",
     "@types/nano": "^7.0.0",
     "@types/pdfjs-dist": "^2.1.3",
     "@types/puppeteer": "^2.0.1",
     "@types/sha1": "^1.1.2",
     "@types/sqlite3": "^3.1.6",
     "@types/winston": "^2.4.4",
+    "better-sqlite3": "^7.0.1",
     "core-js": "^3.2.1",
     "jszip": "^3.4.0",
     "nano": "^8.2.2",
@@ -27,12 +36,18 @@
     "sha1": "^1.1.1",
     "sqlite3": "^4.2.0",
     "ts-dedent": "^1.1.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5",
     "webpack": "^4.43.0",
     "winston": "^3.2.1",
     "yaml": "^1.9.2"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^7.0.2",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "mocha": "^6.2.3"
   }
 }

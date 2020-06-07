@@ -26,8 +26,8 @@ export function mapToJson(map: Map<string | number, any>){
  */
 export function queryPrepare(query: string): string{
     let cleanQuery: string = query.replace(/--.*/g, "")   // remove comments
-                                    .replace(/\n\s+/g, "")   // mush into single line
-                                    .replace(/\n/g, "")      // mush into single line
+                                  .replace(/  +/g, "")    // mush into single line
+                                  .replace(/\n/g, " ")    // mush into single line
     return cleanQuery;
 }
 

@@ -7,6 +7,10 @@ debug
 # Node
 node_modules
 
+# Test Coverage
+.nyc*
+coverage
+
 # TSC
 built
 

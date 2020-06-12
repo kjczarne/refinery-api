@@ -9,9 +9,9 @@ import { IRecord } from '../interfaces';
  */
 export class AnkiIngressEngine {
     // TODO: below not necessary to load and process here but necessary to compare against the original one
-    // public model: IPModel;
-    // public dconf: IPDconf;
-    // public conf: IConf;
+    // model: IPModel;
+    // dconf: IPDconf;
+    // conf: IConf;
 
 
     private _dbPath: string;

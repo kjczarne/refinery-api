@@ -11,8 +11,8 @@ import { conf, models, dconf, decks } from './ankiObjects';
 import { logger, mapToJson, queryPrepare, escapeSingleQuotes } from '../utils';
 
 export class AnkiEgressEngine {
-    public deckName: string;
-    public readonly conf: IYamlConfig
+    deckName: string;
+    readonly conf: IYamlConfig
 
     private _dbPath: string;
     private _deck: IPDeck;

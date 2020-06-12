@@ -2,12 +2,12 @@ import { readFileSync, writeFileSync } from 'fs';
 import JSZip from 'jszip';
 
 export class AnkiPackager {
+    mediaFiles: Array<Buffer>;
+    mediaFileNames: Array<string>;
+
     private _dbPath: string;
     private _mediaMap: Map<number, string> = new Map<number, string>();
     private _outPath: string;
-
-    public mediaFiles: Array<Buffer>;
-    public mediaFileNames: Array<string>;
 
     constructor(dbFilePath: string, outPath: string, mediaFileNames?: Array<string>, mediaFiles?: Array<Buffer>){
         this._dbPath = dbFilePath;

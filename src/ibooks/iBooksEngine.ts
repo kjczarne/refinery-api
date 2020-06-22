@@ -1,18 +1,14 @@
 import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
-import { constructRecord, convertToMarkdown, convertToHtml, sqlQueryRun, convertToFlashcard, constructRecords } from '../engine';
+import { constructRecord, convertToMarkdown, convertToHtml, sqlQueryRun, constructRecords } from '../engine';
 import { readFileSync, writeFileSync } from 'fs';
-import * as yaml from 'yaml';
-import { AnkiEgressEngine } from '../anki/ankiEgressEngine';
-import { AnkiPackager } from '../anki/ankiPackager';
-import { models } from '../anki/ankiObjects';
-import { IPDeck } from '../anki/interfaces';
 import { delay, logger, queryPrepare } from '../utils';
 import { dedent } from 'ts-dedent';
 import { RefineryDatabaseWrapper } from '../engine';
+import { config } from '../configProvider';
 
 export class AppleiBooksEngine {
-    // load in the YAML config:
+    configPath: string;
     config: any;
     pathToAnnotationDb: string;
     pathToLibraryDb: string;
@@ -35,13 +31,14 @@ export class AppleiBooksEngine {
     FROM ZAEANNOTATION;
     `.replace(/\n/g, ' ');
     constructor(configPath: string = './configuration/.refinery.yaml') {
-        this.config = yaml.parse(readFileSync(configPath, 'utf8'));
+        this.configPath = configPath;
+        this.config = config(configPath);
         this.pathToAnnotationDb = this.config.ibooks.annotationsDb;
         this.pathToLibraryDb = this.config.ibooks.libraryDb;
-        this.recordsDb = new RefineryDatabaseWrapper(configPath);
+        this.recordsDb = new RefineryDatabaseWrapper();
     }
 
-    async load(bookName: string): Promise<string> {
+    async load(bookName: string, deck: string = bookName, notebook: string='default'): Promise<string> {
         let pr: Promise<string> = new Promise<string>((resolve, reject)=>{
             sqlQueryRun(this.pathToLibraryDb, this._sqlQuery1).then((response1)=>{
                 sqlQueryRun(this.pathToAnnotationDb, this._sqlQuery2).then((response2)=>{
@@ -53,6 +50,10 @@ export class AppleiBooksEngine {
                         v['pageMap']={pagemapType: 'epubcfi', pagemapValue: v.pagemapValue};
                         v['richContent']='';
                         v['source']=bookName;
+                        v['configPath']=this.configPath;
+                        v['deck']=deck;
+                        v['notebook']=notebook
+                        
                     });
                     // construct records:
                     constructRecords(filteredResponse2).then((response)=>{

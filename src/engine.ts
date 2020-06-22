@@ -1,12 +1,12 @@
 import { IRecord, IPageMap } from './interfaces';
 import * as sqlite from 'better-sqlite3';
-import { AnkiEgressEngine } from './anki/ankiEgressEngine';
 import sha1 from 'sha1';
 import { delay, logger, queryPrepare } from './utils';
 import dedent from 'ts-dedent';
 import * as yaml from 'yaml';
 import { readFileSync } from 'fs';
 import nano, { DocumentScope } from 'nano';
+import { config, algorithmConfig } from './configProvider';
 
 /**
  * @function constructRecord Constructs an IRecord Object
@@ -16,39 +16,57 @@ import nano, { DocumentScope } from 'nano';
  * @param dataField2 note that was added to the original text
  * @param source describes the source of the original record
  * @param richContent map to any rich content that the record should come bundled with
+ * //TODO: fix up docs
  */
 export function constructRecord(
     dataField1: string,
     dataField2: string,
     source: string,
     pageMap?: IPageMap,
-    richContent: string = ''): IRecord{
-        let now: string = Date.now().valueOf().toString();
-        let record: IRecord = {
-            pageMap: pageMap,
-            dataField1: dataField1,
-            dataField2: dataField2,
-            source: source,
-            richContent: richContent,
-            _id: sha1(`${now}${dataField1}${dataField2}`),
-            timestampCreated: Date.now().valueOf(),
-            timestampModified: Date.now().valueOf()
-        }
-        return record;
+    configPath: string = './configuration/.refinery.yaml',
+    deck: string = 'default',
+    notebook?: string,
+    richContent: string = ''
+): IRecord {
+    let now: string = Date.now().toString();
+    let configObj: any = config(configPath)
+    let algorithmConfigObj: any = algorithmConfig(deck, configObj);
+
+    let record: IRecord = {
+        pageMap: pageMap,
+        dataField1: dataField1,
+        dataField2: dataField2,
+        source: source,
+        richContent: richContent,
+        _id: sha1(`${now}${dataField1}${dataField2}`),
+        timestampCreated: Date.now(),
+        timestampModified: Date.now(),
+        flashcard: {
+            easinessFactor: algorithmConfigObj.new.initialFactor,
+            deck: deck,
+            scheduler: {
+                pastRevisions: new Array<number>(),
+                nextRevision: Date.now()
+            }
+        },
+        notebook: notebook
+    }
+    return record;
 }
 
 /**
  * @function isRecord Checks if an object is of type `IRecord`
  * @param obj object of any type
  */
-function isRecord(obj: any): obj is IRecord{
+export function isRecord(obj: any): obj is IRecord{
     let bools: Array<boolean> = [
         'dataField1' in obj,
         'dataField2' in obj,
-        'richContent' in obj,
-        'guid' in obj,
+        '_id' in obj,
         'timestampCreated' in obj,
-        'timestampModified' in obj
+        'timestampModified' in obj,
+        'flashcard' in obj,
+        'source' in obj
     ]
     let check: boolean = bools.every((x)=>{return x===true});
     return check;
@@ -144,20 +162,20 @@ export function convertToHtml(
     return htmlCore;
 }
 
-export function convertToFlashcard(
-    record: IRecord | Array<IRecord>,
-    ankiEngine: AnkiEgressEngine,
-    // deckModel: IModel
-): void{
-    if (isRecord(record)){
-        ankiEngine.addCard(record);
-    }
-    else{
-        for (let el of record){
-            ankiEngine.addCard(el);
-        }
-    }
-}
+// export function convertToFlashcard(
+//     record: IRecord | Array<IRecord>,
+//     ankiEngine: AnkiEgressEngine,
+//     // deckModel: IModel
+// ): void{
+//     if (isRecord(record)){
+//         ankiEngine.addCard(record);
+//     }
+//     else{
+//         for (let el of record){
+//             ankiEngine.addCard(el);
+//         }
+//     }
+// }
 
 /**
  * @function sqlQuery
@@ -261,7 +279,6 @@ export function sqlQueryRun(
 }
 
 export function sqlSchema(dbPath: string, schema: string){
-    //FIXME: This stupid function is still a problem
     let cleanSchema: string = queryPrepare(schema)
     let splitSchema: Array<string> = cleanSchema.split(';');
     // pop last, because we don't expect any valid query after the last `;` char:
@@ -328,6 +345,9 @@ export async function constructRecords(
                 rec.dataField2,
                 rec.source,
                 rec.pageMap,
+                rec.configPath,
+                rec.deck,
+                rec.notebook,
                 rec.richContent
             );
             records.push(record);
@@ -343,8 +363,8 @@ export class RefineryDatabaseWrapper {
     server: nano.DatabaseScope;
     db: DocumentScope<unknown>;
 
-    constructor(configPath: string = './configuration/.refinery.yaml'){
-        this.config = yaml.parse(readFileSync(configPath, 'utf8'));
+    constructor(){
+        this.config = config();
         // TODO: more secure handling of the database authentication:
         const couchDb = nano(
             {url: this.config.refinery.database.databaseServer, requestDefaults: {jar:true}}

@@ -33,6 +33,26 @@ export interface IRecord {
     timestampCreated: number,
     timestampModified: number,
     pageMap?: IPageMap,
-    source: string
+    source: string,
+    flashcard: IFlashcard,  // data related to flashcard-based scheduling
+    notebook?: string
 }
 
+/**
+ * @interface IFlashcard
+ * describes flashcard-related metadata of an `IRecord`
+ */
+export interface IFlashcard {
+    easinessFactor: number,
+    deck: string,
+    scheduler: {
+        pastRevisions: Array<number>,
+        nextRevision: number
+    }
+}
+
+/**
+ * @type displayCallback describes a front-end display callback
+ * for a flashcard in `phlower` front end
+ */
+export type displayCallback = (flashcard: IRecord, selectField: string)=>void

@@ -1,5 +1,6 @@
 import * as winston from 'winston';
 import { format } from 'logform';
+import { IRecord, displayCallback } from './interfaces';
 
 /**
  * @function delay basic delay function (async)
@@ -40,6 +41,10 @@ export function escapeSingleQuotes(str: string | undefined | null){
         return str.replace(/'/g, `''`)
     }
     else return null;
+}
+
+export function consoleDisplayCallback(flashcard: IRecord, displayField: string){
+    console.log(flashcard[displayField]);
 }
 
 /**

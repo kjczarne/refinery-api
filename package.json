@@ -2,7 +2,7 @@
   "name": "refinery_back",
   "version": "0.0.1a",
   "description": "PDF and EPUB annotations extractor",
-  "main": "index.js",
+  "main": "./built/src/index.js",
   "scripts": {
     "start": "node ./built/server.js",
     "build": "tsc",

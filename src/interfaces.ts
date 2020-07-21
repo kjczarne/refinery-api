@@ -35,7 +35,8 @@ export interface IRecord {
     pageMap?: IPageMap,
     source: string,
     flashcard: IFlashcard,  // data related to flashcard-based scheduling
-    notebook?: string
+    notebook?: string,
+    linked?: string | Array<string>
 }
 
 /**

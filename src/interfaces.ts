@@ -44,7 +44,7 @@ export interface IRecord {
  */
 export interface IFlashcard {
     easinessFactor: number,
-    deck: string,
+    deck: string | Array<string>,
     scheduler: {
         pastRevisions: Array<number>,
         nextRevision: number

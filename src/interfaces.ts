@@ -57,3 +57,65 @@ export interface IFlashcard {
  * for a flashcard in `phlower` front end
  */
 export type displayCallback = (flashcard: IRecord, selectField: string)=>void
+
+/**
+ * @interface IConfig defines the master config object
+ * It is consistent with the YAML spec and is reused
+ * for the React App.
+ */
+export interface IConfig {
+    refinery: {
+
+    },
+    ibooks: {
+
+    },
+    anki: {
+
+    },
+    phlower: {
+        notebooks: Array<{
+            cfgId: string
+        }>,
+        decks: Array<{
+            cfgId: string,
+            algorithm: string
+        }>,
+        algorithms: Array<{
+            cfgId: string,
+            new: {
+                maxPerDay: number,
+                startingDelays: [number, number],
+                startingIntervals: [number, number],
+                initialFactor: number,
+                order: 'random' | 'by-creation-date'
+            },
+            fail: {
+                failsUntilLeech: number,
+                minLeechInterval: number,
+                delays: Array<number>,
+                leechAction: number,
+                multiplyInterval: number
+            },
+            rev: {
+                maxPerDay: number
+                fuzz: number
+                multiplyInterval: number
+                maxInterval: number
+                initialEaseFactorMultiplier: number
+                minSpace: number
+            },
+            timer: boolean,
+            maxTimeSpentOnCard: number,
+            autoplayAudio: boolean,
+            replayAudioWhenFlipped: boolean
+        }>
+    },
+    formatting: Array<{
+        cfgId: string,
+        fields: Array<{
+            name: string,
+            css: string
+        }>
+    }>
+}

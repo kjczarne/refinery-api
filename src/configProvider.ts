@@ -3,11 +3,20 @@ import { readFileSync } from 'fs';
 
 /**
  * @function config returns parsed YAML config as JS Object
- * @param configPath path to the YAML config
+ * @param config path to the YAML config or YAML-like object
+ * 
+ * This function behaves like an identity function when
+ * an object is provided from the UI (Redux Store), otherwise
+ * parses a config from a default YAML file.
  */
-export function config(configPath: string = './configuration/.refinery.yaml'){
+export function config(config: string | any = './configuration/.refinery.yaml'){
     // can be modified later to e.g. parse other config files instead
-    return yaml.parse(readFileSync(configPath, 'utf8'));
+    if (typeof config === 'string'){
+        return yaml.parse(readFileSync(config, 'utf8'));
+    }
+    else {
+        return config;
+    }
 }
 
 /**

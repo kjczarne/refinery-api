@@ -62,8 +62,7 @@ export const logger = winston.createLogger({
     transports: [
         // Write all logs with level `error` and below to `error.log`
         // Write all logs with level `silly` and below to `combined.log`
-        new winston.transports.File({ filename: './debug/error.log', level: 'error' }),
-        new winston.transports.File({ filename: './debug/combined.log', level: 'silly' })
+        new winston.transports.Console({level: 'silly'})
     ]
 });
 

@@ -1,18 +1,63 @@
 import * as yaml from 'yaml';
-import { readFileSync } from 'fs';
+import { IConfig } from './interfaces';
 
 /**
  * @function config returns parsed YAML config as JS Object
- * @param config path to the YAML config or YAML-like object
+ * @param config YAML config as string or YAML-like object, or undefined
  * 
  * This function behaves like an identity function when
  * an object is provided from the UI (Redux Store), otherwise
- * parses a config from a default YAML file.
+ * can parse a YAML serialized string or provide default config.
  */
-export function config(config: string | any = './configuration/.refinery.yaml'){
-    // can be modified later to e.g. parse other config files instead
-    if (typeof config === 'string'){
-        return yaml.parse(readFileSync(config, 'utf8'));
+export function config(config: IConfig | string | undefined = undefined){
+    const defaultConfig: IConfig = {
+        refinery: {
+            database: {
+                databaseServer: 'http://localhost:5984/',
+                databaseName: 'refinerydb',
+                user: 'admin',
+                password: 'password'
+            }
+        },
+        phlower: {
+            notebooks: [{cfgId: 'default'}],
+            decks: [{cfgId: 'default', algorithm: 'default'}],
+            algorithms: [{
+                cfgId: 'default',
+                new: {
+                    maxPerDay: 20,
+                    startingDelays: [1, 10],
+                    startingIntervals: [1, 4],
+                    initialFactor: 2.5,
+                    order: 'random'
+                },
+                fail: {
+                    failsUntilLeech: 8,
+                    minLeechInterval: 1,
+                    delays: [10],
+                    leechAction: 0,
+                    multiplyInterval: 0,
+                },
+                rev: {
+                    maxPerDay: 100,
+                    fuzz: 0.05,
+                    multiplyInterval: 1,
+                    maxInterval: 365,
+                    initialEaseFactorMultiplier: 1.3,
+                    minSpace: 1,
+                },
+                timer: true,
+                maxTimeSpentOnCard: 60,
+                autoplayAudio: true,
+                replayAudioWhenFlipped: true,
+            }]
+        }
+    }
+    if (typeof config === 'undefined'){
+        return defaultConfig;
+    }
+    else if (typeof config === 'string'){
+        return yaml.parse(config);
     }
     else {
         return config;

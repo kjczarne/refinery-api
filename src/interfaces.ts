@@ -65,13 +65,12 @@ export type displayCallback = (flashcard: IRecord, selectField: string)=>void
  */
 export interface IConfig {
     refinery: {
-
-    },
-    ibooks: {
-
-    },
-    anki: {
-
+        database: {
+            databaseServer: string,
+            databaseName: string,
+            user: string,
+            password: string
+        }
     },
     phlower: {
         notebooks: Array<{
@@ -110,12 +109,5 @@ export interface IConfig {
             autoplayAudio: boolean,
             replayAudioWhenFlipped: boolean
         }>
-    },
-    formatting: Array<{
-        cfgId: string,
-        fields: Array<{
-            name: string,
-            css: string
-        }>
-    }>
+    }
 }

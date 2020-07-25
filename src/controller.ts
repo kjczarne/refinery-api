@@ -1,11 +1,11 @@
 import { IRecord, displayCallback } from "./interfaces";
 import { RefineryDatabaseWrapper } from "./engine";
-import * as yaml from 'yaml';
-import { readFileSync } from 'fs';
 import { config } from './configProvider';
-import nano, { MangoResponse } from "nano";
 import { Scheduler } from './scheduler';
 import { logger } from "./utils";
+import PouchDb from 'pouchdb';
+import PouchdbFind from 'pouchdb-find';
+PouchDb.plugin(PouchdbFind);
 
 export class FlashcardRevisionController {
 
@@ -34,8 +34,8 @@ export class FlashcardRevisionController {
    * @function getScheduledFlaschcards fetches flashcards that are scheduled for revision
    * from records database
    */
-  async getScheduledFlaschcards() {
-    const flashcardsQuery: nano.MangoQuery = {
+  async getScheduledFlaschcards(){
+    const flashcardsQuery: PouchDB.Find.FindRequest<IRecord> = {
       selector: {
         flashcard: {
           scheduler: {
@@ -45,14 +45,13 @@ export class FlashcardRevisionController {
       },
     }
     try {
-      await this.recordsDb.auth;
       let flashcardsResponse = await this.recordsDb.db.find(flashcardsQuery);
       let flashcards: Array<any> | undefined = flashcardsResponse.docs
       // for (let flashcard of flashcards){
       //     // DB returns date string not Date object, thus a parse needs to happen
       //     flashcard.flashcard.scheduler.nextRevision = Date.parse(flashcard.flashcard.scheduler.nextRevision);
       // }
-      return flashcards;
+      return <Array<IRecord>><unknown>flashcards;
     }
     catch (err) {
       logger.log({
@@ -113,7 +112,7 @@ export class FlashcardRevisionController {
   async postUpdatedFlashcards() {
     try {
       // await this.recordsDb.auth;  //TODO: check if the connection stays open
-      await this.recordsDb.db.bulk({ docs: this.answeredStack });
+      await this.recordsDb.db.bulkDocs(this.answeredStack);
     }
     catch (err) {
       logger.log({

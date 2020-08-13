@@ -1,7 +1,6 @@
 import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
 import { delay, logger, queryPrepare } from './utils';
-import nano, { DocumentScope } from 'nano';
 import { config, algorithmConfig } from './configProvider';
 import PouchDb from 'pouchdb';
 
@@ -220,13 +219,6 @@ export class RefineryDatabaseWrapper {
     constructor(){
         this.config = config();
         // TODO: more secure handling of the database authentication:
-        // const couchDb = nano(
-        //     {url: this.config.refinery.database.databaseServer, requestDefaults: {jar:true}}
-        // ),
-        //     username = this.config.refinery.database.user,
-        //     userpass = this.config.refinery.database.password,
-        //     server = couchDb.db,
-        //     db = couchDb.db.use(this.config.refinery.database.databaseName);
         const opts = {
             auth: {
                 username: this.config.refinery.database.user,
@@ -239,6 +231,7 @@ export class RefineryDatabaseWrapper {
         // this.auth = couchDb.auth(username, userpass);
         // this.server = server;
         this.db = db;
+        // TODO: local db and sync methods
     }
 }
 

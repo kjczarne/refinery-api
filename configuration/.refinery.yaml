@@ -1,7 +1,7 @@
 refinery:
   database:
     databaseServer: 'http://localhost:5984/'
-    databaseName: 'refinerydb'
+    databaseName: 'lorem'
     user: admin
     password: password
   adapterConfig:

@@ -8,9 +8,10 @@ debug
 # Node
 node_modules
 
-# Test Coverage
+# Test Coverage and testing
 .nyc*
 coverage
+mantest.*
 
 # TSC
 built

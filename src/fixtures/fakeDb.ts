@@ -11,6 +11,7 @@ let minimalRecord: IRecord = {
     timestampCreated: Date.now(),
     timestampModified: Date.now(),
     source: 'source',
+    notebook: 'default',
     flashcard: {
         easinessFactor: 2.5,
         deck: 'default',

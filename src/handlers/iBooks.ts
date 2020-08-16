@@ -1,4 +1,3 @@
-import * as sqlite from 'sqlite3';
 import { IRecord } from '../interfaces';
 import { constructRecord, convertToMarkdown, convertToHtml, constructRecords } from '../engine';
 import { readFileSync, writeFileSync } from 'fs';
@@ -7,13 +6,12 @@ import { queryPrepare, sqlQueryRun } from '../sql';
 import { dedent } from 'ts-dedent';
 import { RefineryDatabaseWrapper } from '../engine';
 import { config } from '../configProvider';
+import { BaseHandler } from './baseHandler';
 
-export class AppleiBooksEngine {
-    configPath: string;
+export class AppleiBooksEngine extends BaseHandler {
     config: any;
     pathToAnnotationDb: string;
     pathToLibraryDb: string;
-    recordsDb: RefineryDatabaseWrapper;
 
     private _sqlQuery1: string = dedent`
     SELECT 
@@ -32,14 +30,11 @@ export class AppleiBooksEngine {
     FROM ZAEANNOTATION;
     `.replace(/\n/g, ' ');
     constructor(configPath: string = './configuration/.refinery.yaml') {
-        this.configPath = configPath;
-        this.config = config(configPath);
+        super(configPath);
         this.pathToAnnotationDb = this.config.ibooks.annotationsDb;
         this.pathToLibraryDb = this.config.ibooks.libraryDb;
-        this.recordsDb = new RefineryDatabaseWrapper();
     }
 
-    // TODO: refactor as 'put'
     async load(bookName: string, deck: string = bookName, notebook: string='default'): Promise<string> {
         let pr: Promise<string> = new Promise<string>((resolve, reject)=>{
             sqlQueryRun(this.pathToLibraryDb, this._sqlQuery1).then((response1)=>{

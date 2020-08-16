@@ -26,12 +26,14 @@ export class BaseHandler {
 
   /**
    * @async @function export exports a serialized Deck or Deck fragment
+   * @param output output path or location where to store serialized record
    * @param deck deck name in Refinery Database
    * @param notebook notebook name in Refinery Database
    * @param diffFilter a filter that determines what portion of a deck to export
    * @param flipped if true, the dataField2 should be treated as front
    */
   async export(
+    output: string,
     deck: string = 'default',
     notebook: string = 'default',
     diffFilter: string = '',

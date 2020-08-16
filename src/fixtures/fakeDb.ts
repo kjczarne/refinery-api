@@ -1,5 +1,6 @@
 import { RefineryDatabaseWrapper } from '../engine';
 import { IRecord } from '../interfaces';
+import { logger } from '../utils';
 
 const db = new RefineryDatabaseWrapper();
 
@@ -21,7 +22,15 @@ let minimalRecord: IRecord = {
 }
 
 let a = async ()=>{
-    await db.db.put(minimalRecord);
+    try {
+        await db.db.put(minimalRecord);
+    } catch(err) {
+        logger.log({
+            level: 'error',
+            message: `Put rejected: ${err}`
+        });
+        console.log(err);
+    }
 }
 
 a();

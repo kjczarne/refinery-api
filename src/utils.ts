@@ -22,17 +22,6 @@ export function mapToJson(map: Map<string | number, any>){
 }
 
 /**
- * @function _queryPrepare initially cleans up query string
- * @param query Valid SQL query.
- */
-export function queryPrepare(query: string): string{
-    let cleanQuery: string = query.replace(/--.*/g, "")   // remove comments
-                                  .replace(/  +/g, "")    // mush into single line
-                                  .replace(/\n/g, " ")    // mush into single line
-    return cleanQuery;
-}
-
-/**
  * @function escapeSingleQuotes escapes single quotes in a SQL query
  * @param str SQL query that can possibly contain unescaped single quotes
  */
@@ -62,7 +51,8 @@ export const logger = winston.createLogger({
     transports: [
         // Write all logs with level `error` and below to `error.log`
         // Write all logs with level `silly` and below to `combined.log`
-        new winston.transports.Console({level: 'silly'})
+        new winston.transports.File({ filename: './debug/error.log', level: 'error' }),
+        new winston.transports.File({ filename: './debug/combined.log', level: 'silly' })
     ]
 });
 

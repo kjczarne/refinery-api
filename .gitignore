@@ -3,6 +3,7 @@ stash
 debug
 .DS_Store
 .vscode
+*.log
 
 # Node
 node_modules

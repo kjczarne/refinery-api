@@ -1,6 +1,6 @@
 import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
-import { delay, logger, queryPrepare } from './utils';
+import { delay, logger } from './utils';
 import { config, algorithmConfig } from './configProvider';
 import PouchDb from 'pouchdb';
 

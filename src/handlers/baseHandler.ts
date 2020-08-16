@@ -20,21 +20,25 @@ export class BaseHandler {
     deck: string = 'default',
     notebook: string = 'default'
   ): Promise<any> {
-    let pr: Promise<any> = new Promise<any>((resolve, reject) => {
-      resolve({
-        entity: entity,
-        deck: deck,
-        notebook: notebook
-      })
-    })
+    let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
     return pr;
   }
 
+  /**
+   * @async @function export exports a serialized Deck or Deck fragment
+   * @param deck deck name in Refinery Database
+   * @param notebook notebook name in Refinery Database
+   * @param diffFilter a filter that determines what portion of a deck to export
+   * @param flipped if true, the dataField2 should be treated as front
+   */
   async export(
     deck: string = 'default',
-    notebook: string = 'default'
+    notebook: string = 'default',
+    diffFilter: string = '',
+    flipped: boolean = false
   ): Promise<any> {
-
+    let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
+    return pr;
   }
 }
 

@@ -34,7 +34,7 @@ export interface IRecord {
     timestampModified: number,
     pageMap?: IPageMap,
     source: string,
-    flashcard: IFlashcard,  // data related to flashcard-based scheduling
+    flashcard?: IFlashcard,  // data related to flashcard-based scheduling (custom internal scheduler)
     notebook?: string,
     linked?: string | Array<string>
 }

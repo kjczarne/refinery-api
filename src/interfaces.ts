@@ -27,6 +27,7 @@ export interface IRecord {
     [x: string]: any,
     dataField1: string,
     dataField2: string,
+    note?: string
     _id: string,
     _rev?: string,
     richContent?: string,

@@ -3,6 +3,7 @@ import relay from './egressRelay';
 import AndevEngine from './handlers/andevFlashcards';
 import MdEngine from './handlers/markdown';
 import yargs from 'yargs';
+import { DEFAULT_CONFIG_PATH } from './configProvider';
 
 const argv = yargs.options(
   {
@@ -42,10 +43,16 @@ const argv = yargs.options(
   }
 ).argv;
 
+if (argv.config !== undefined) {
+  var config = argv.config;
+} else {
+  var config = DEFAULT_CONFIG_PATH
+}
+
 switch (argv.what) {
   case 'andev':
     relay(
-      new AndevEngine(),
+      new AndevEngine(config),
       argv.path,
       argv.deck,
       argv.notebook,
@@ -54,7 +61,7 @@ switch (argv.what) {
     );
   case 'md': {
     relay(
-      new MdEngine(),
+      new MdEngine(config),
       argv.path,
       argv.deck,
       argv.notebook,

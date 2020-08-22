@@ -4,6 +4,7 @@ debug
 .DS_Store
 .vscode
 *.log
+temp.*
 
 # Node
 node_modules

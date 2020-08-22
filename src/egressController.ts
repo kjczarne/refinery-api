@@ -1,5 +1,6 @@
 // use process.argv here, first two args are the node command elements (node, script path)
 import andevFlashcards from './egress/andevFlashcards';
+import markdown from './egress/markdown';
 import yargs from 'yargs';
 
 const argv = yargs.options(
@@ -46,7 +47,13 @@ switch (argv.what) {
       argv.flipped
     );
   case 'md': {
-    // TODO: MD summaries
+    markdown(
+      argv.path,
+      argv.deck,
+      argv.notebook,
+      '',
+      argv.flipped
+    )
   }
 }
 

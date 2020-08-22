@@ -98,7 +98,7 @@ export class Scheduler {
      * @param IRecord an IRecord from which to fetch next revision
      */
     getNextRevision(record: IRecord){
-        return record.flashcard?.scheduler.nextRevision
+        return record.flashcard?.scheduler?.nextRevision
     }
 
     /**
@@ -106,12 +106,12 @@ export class Scheduler {
      * @param record an IRecord to be modified
      */
     setNextRevision(record: IRecord, answerCorrectness: number){
-        if (record.flashcard !== undefined) {
+        if (record.flashcard !== undefined && record.flashcard.scheduler !== undefined) {
             record.flashcard.scheduler.nextRevision = 
             this.algorithmWrapper.computeNextInterval(
                 new Date(record.flashcard.scheduler.nextRevision),
                 this.algorithmWrapper.getNewEasinessFactor(
-                    record.flashcard.easinessFactor, 
+                    record.flashcard.scheduler.easinessFactor, 
                     answerCorrectness
                 )
             ).valueOf();

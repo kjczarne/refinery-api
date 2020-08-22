@@ -7,8 +7,8 @@
  * and egress behavior independently.
  */
 export interface IPageMap {
-    pagemapType?: "epubcfi" | "pdf"  // modifiable, can allow additional types
-    pagemapValue?: string
+  pagemapType?: "epubcfi" | "pdf"  // modifiable, can allow additional types
+  pagemapValue?: string
 }
 
 /**
@@ -24,20 +24,20 @@ export interface IPageMap {
  * with `dataField3` indexing upwards
  */
 export interface IRecord {
-    [x: string]: any,
-    dataField1: string,
-    dataField2: string,
-    note?: string
-    _id: string,
-    _rev?: string,
-    richContent?: string,
-    timestampCreated: number,
-    timestampModified: number,
-    pageMap?: IPageMap,
-    source: string,
-    flashcard?: IFlashcard,  // data related to flashcard-based scheduling (custom internal scheduler)
-    notebook?: string,
-    linked?: string | Array<string>
+  [x: string]: any,
+  dataField1: string,
+  dataField2: string,
+  note?: string
+  _id: string,
+  _rev?: string,
+  richContent?: string,
+  timestampCreated: number,
+  timestampModified: number,
+  pageMap?: IPageMap,
+  source: string,
+  flashcard?: IFlashcard,  // data related to flashcard-based scheduling (custom internal scheduler)
+  notebook?: string,
+  linked?: string | Array<string>
 }
 
 /**
@@ -45,19 +45,21 @@ export interface IRecord {
  * describes flashcard-related metadata of an `IRecord`
  */
 export interface IFlashcard {
-    easinessFactor: number,
-    deck: string,
-    scheduler: {
-        pastRevisions: Array<number>,
-        nextRevision: number
-    }
+  deck: string,
+  scheduler?: ISchedulerProps
+}
+
+export interface ISchedulerProps {
+  pastRevisions: Array<number>,
+  nextRevision: number,
+  easinessFactor: number,
 }
 
 /**
  * @type displayCallback describes a front-end display callback
  * for a flashcard in `phlower` front end
  */
-export type displayCallback = (flashcard: IRecord, selectField: string)=>void
+export type displayCallback = (flashcard: IRecord, selectField: string) => void
 
 /**
  * @interface IConfig defines the master config object
@@ -65,50 +67,50 @@ export type displayCallback = (flashcard: IRecord, selectField: string)=>void
  * for the React App.
  */
 export interface IConfig {
-    refinery: {
-        database: {
-            databaseServer: string,
-            databaseName: string,
-            user: string,
-            password: string
-        }
-    },
-    phlower: {
-        notebooks: Array<{
-            cfgId: string
-        }>,
-        decks: Array<{
-            cfgId: string,
-            algorithm: string
-        }>,
-        algorithms: Array<{
-            cfgId: string,
-            new: {
-                maxPerDay: number,
-                startingDelays: [number, number],
-                startingIntervals: [number, number],
-                initialFactor: number,
-                order: 'random' | 'by-creation-date'
-            },
-            fail: {
-                failsUntilLeech: number,
-                minLeechInterval: number,
-                delays: Array<number>,
-                leechAction: number,
-                multiplyInterval: number
-            },
-            rev: {
-                maxPerDay: number
-                fuzz: number
-                multiplyInterval: number
-                maxInterval: number
-                initialEaseFactorMultiplier: number
-                minSpace: number
-            },
-            timer: boolean,
-            maxTimeSpentOnCard: number,
-            autoplayAudio: boolean,
-            replayAudioWhenFlipped: boolean
-        }>
+  refinery: {
+    database: {
+      databaseServer: string,
+      databaseName: string,
+      user: string,
+      password: string
     }
+  },
+  phlower: {
+    notebooks: Array<{
+      cfgId: string
+    }>,
+    decks: Array<{
+      cfgId: string,
+      algorithm: string
+    }>,
+    algorithms: Array<{
+      cfgId: string,
+      new: {
+        maxPerDay: number,
+        startingDelays: [number, number],
+        startingIntervals: [number, number],
+        initialFactor: number,
+        order: 'random' | 'by-creation-date'
+      },
+      fail: {
+        failsUntilLeech: number,
+        minLeechInterval: number,
+        delays: Array<number>,
+        leechAction: number,
+        multiplyInterval: number
+      },
+      rev: {
+        maxPerDay: number
+        fuzz: number
+        multiplyInterval: number
+        maxInterval: number
+        initialEaseFactorMultiplier: number
+        minSpace: number
+      },
+      timer: boolean,
+      maxTimeSpentOnCard: number,
+      autoplayAudio: boolean,
+      replayAudioWhenFlipped: boolean
+    }>
+  }
 }

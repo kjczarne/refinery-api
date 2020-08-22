@@ -13,9 +13,9 @@ let minimalRecord: IRecord = {
     source: 'source',
     notebook: 'default',
     flashcard: {
-        easinessFactor: 2.5,
         deck: 'default',
         scheduler: {
+            easinessFactor: 2.5,
             pastRevisions: new Array<number>(),
             nextRevision: Date.now()
         }

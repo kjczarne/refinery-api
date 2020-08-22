@@ -38,9 +38,9 @@ export function constructRecord(
         timestampCreated: Date.now(),
         timestampModified: Date.now(),
         flashcard: {
-            easinessFactor: algorithmConfigObj.new.initialFactor,
             deck: deck,
             scheduler: {
+                easinessFactor: algorithmConfigObj.new.initialFactor,
                 pastRevisions: new Array<number>(),
                 nextRevision: Date.now()
             }

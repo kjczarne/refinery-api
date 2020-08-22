@@ -5,7 +5,7 @@ import { delay, logger } from '../utils';
 import { queryPrepare, sqlQueryRun } from '../sql';
 import { dedent } from 'ts-dedent';
 import { RefineryDatabaseWrapper } from '../engine';
-import { config } from '../configProvider';
+import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { BaseHandler } from './baseHandler';
 
 export class AppleiBooksEngine extends BaseHandler {
@@ -31,7 +31,7 @@ export class AppleiBooksEngine extends BaseHandler {
     FROM ZAEANNOTATION;
     `.replace(/\n/g, ' ');
   
-  constructor(configPath: string = './configuration/.refinery.yaml') {
+  constructor(configPath: string = DEFAULT_CONFIG_PATH) {
     super(configPath);
     this.pathToAnnotationDb = this.config.ibooks.annotationsDb;
     this.pathToLibraryDb = this.config.ibooks.libraryDb;

@@ -1,5 +1,5 @@
 import { RefineryDatabaseWrapper } from '../engine';
-import { config } from '../configProvider';
+import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { IRecord } from '../interfaces';
 import { logger } from '../utils';
 
@@ -12,7 +12,7 @@ export class BaseHandler {
   recordsDb: RefineryDatabaseWrapper;
   static descriptor: string;
 
-  constructor(configPath: string = './configuration/.refinery.yaml') {
+  constructor(configPath: string = DEFAULT_CONFIG_PATH) {
     this.configPath = configPath;
     this.config = config(configPath);
     this.recordsDb = new RefineryDatabaseWrapper();

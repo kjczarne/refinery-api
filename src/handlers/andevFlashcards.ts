@@ -10,11 +10,6 @@ export class AndevFldsEngine extends BaseHandler {
   
   static descriptor = 'AnDev Flashcards'
 
-  constructor(configPath: string = './configuration/.refinery.yaml') {
-    super(configPath);
-
-  }
-
   async load(): Promise<string> {  // TODO: AnDev ingress
     let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
     return pr;
@@ -39,7 +34,7 @@ export class AndevFldsEngine extends BaseHandler {
     let serialized: string = ''
     try {
       let flashcards: Array<IRecord> | undefined = await this.find(deck, notebook, diffFilter)
-      
+
       if (flashcards !== undefined) {
         for (let fld of flashcards){
           ids.push(fld._id);

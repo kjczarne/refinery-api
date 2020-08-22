@@ -8,12 +8,14 @@ PouchDb.plugin(PouchdbFind);
 
 export class AndevFldsEngine extends BaseHandler {
   
+  static descriptor = 'AnDev Flashcards'
+
   constructor(configPath: string = './configuration/.refinery.yaml') {
     super(configPath);
 
   }
 
-  async load(): Promise<string> {
+  async load(): Promise<string> {  // TODO: AnDev ingress
     let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
     return pr;
   }
@@ -33,41 +35,33 @@ export class AndevFldsEngine extends BaseHandler {
     diffFilter: string = '',  // TODO: diff filter implementation e.g. diffs database?
     flipped: boolean = false
   ): Promise<Array<string> | undefined> {
-    const flashcardsQuery: PouchDB.Find.FindRequest<IRecord> = {
-      selector: {
-        notebook: notebook,
-        flashcard: {
-          deck: deck
-        }
-      },
-    }
     let ids: Array<string> = Array<string>();
     let serialized: string = ''
     try {
-      let flashcardsResponse = await this.recordsDb.db.find(flashcardsQuery);
-      let flashcards: Array<any> | undefined = flashcardsResponse.docs
+      let flashcards: Array<IRecord> | undefined = await this.find(deck, notebook, diffFilter)
       
-      for (let fld of <Array<IRecord>><unknown>flashcards){
-        ids.push(fld._id);
-        let row: string = ''
-        let url: string = ''
-        let examples: string = ''
-        if (isUrl(fld.source)){
-          url = ',' + fld.source
+      if (flashcards !== undefined) {
+        for (let fld of flashcards){
+          ids.push(fld._id);
+          let row: string = ''
+          let url: string = ''
+          let examples: string = ''
+          if (isUrl(fld.source)){
+            url = ',' + fld.source
+          }
+          if (fld.note !== undefined) {
+            examples = ',' + fld.note;
+          }
+          let optionalFields: string = examples + url
+          if (flipped) {
+            row += fld.dataField2 + ',' + fld.dataField1 + optionalFields + '\n'
+          } else {
+            row += fld.dataField1 + ',' + fld.dataField2 + optionalFields + '\n'
+          }
+          serialized += row;
         }
-        if (fld.note !== undefined) {
-          examples = ',' + fld.note;
-        }
-        let optionalFields: string = examples + url
-        if (flipped) {
-          row += fld.dataField2 + ',' + fld.dataField1 + optionalFields + '\n'
-        } else {
-          row += fld.dataField1 + ',' + fld.dataField2 + optionalFields + '\n'
-        }
-        serialized += row;
+        writeFileSync(output, serialized, {encoding: 'utf-8'});
       }
-
-      writeFileSync(output, serialized, {encoding: 'utf-8'});
 
       return ids;
 

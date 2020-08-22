@@ -1,6 +1,7 @@
 // use process.argv here, first two args are the node command elements (node, script path)
-import andevFlashcards from './egress/andevFlashcards';
-import markdown from './egress/markdown';
+import relay from './egressRelay';
+import AndevEngine from './handlers/andevFlashcards';
+import MdEngine from './handlers/markdown';
 import yargs from 'yargs';
 
 const argv = yargs.options(
@@ -33,13 +34,18 @@ const argv = yargs.options(
       type: 'boolean',
       demandOption: false,
       default: false
+    },
+    config: {
+      type: 'string',
+      demandOption: false
     }
   }
 ).argv;
 
 switch (argv.what) {
   case 'andev':
-    andevFlashcards(
+    relay(
+      new AndevEngine(),
       argv.path,
       argv.deck,
       argv.notebook,
@@ -47,7 +53,8 @@ switch (argv.what) {
       argv.flipped
     );
   case 'md': {
-    markdown(
+    relay(
+      new MdEngine(),
       argv.path,
       argv.deck,
       argv.notebook,

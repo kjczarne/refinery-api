@@ -9,9 +9,10 @@ import { config } from '../configProvider';
 import { BaseHandler } from './baseHandler';
 
 export class AppleiBooksEngine extends BaseHandler {
-  config: any;
   pathToAnnotationDb: string;
   pathToLibraryDb: string;
+
+  static descriptor = 'iBooks'
 
   private _sqlQuery1: string = dedent`
     SELECT 
@@ -29,6 +30,7 @@ export class AppleiBooksEngine extends BaseHandler {
     ZANNOTATIONASSETID AS assetId
     FROM ZAEANNOTATION;
     `.replace(/\n/g, ' ');
+  
   constructor(configPath: string = './configuration/.refinery.yaml') {
     super(configPath);
     this.pathToAnnotationDb = this.config.ibooks.annotationsDb;

@@ -1,5 +1,7 @@
 import { RefineryDatabaseWrapper } from '../engine';
 import { config } from '../configProvider';
+import { IRecord } from '../interfaces';
+import { logger } from '../utils';
 
 /**
  * @class BaseHandler base class for the handler classes
@@ -8,6 +10,7 @@ export class BaseHandler {
   configPath: string;
   config: any;
   recordsDb: RefineryDatabaseWrapper;
+  static descriptor: string;
 
   constructor(configPath: string = './configuration/.refinery.yaml') {
     this.configPath = configPath;
@@ -41,6 +44,43 @@ export class BaseHandler {
   ): Promise<any> {
     let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
     return pr;
+  }
+
+
+  /**
+   * @function find
+   * This performs a Mango query against the Db
+   * and filters out relevant records.
+   * @param deck deck on the IRecord
+   * @param notebook notebook on the IRecord
+   */
+  async find(
+    deck: string = 'default',
+    notebook: string = 'default',
+    diffFilter: string = '',  // TODO: diff filter implementation e.g. diffs database?
+  ): Promise<Array<IRecord> | undefined> {
+    const flashcardsQuery: PouchDB.Find.FindRequest<IRecord> = {
+      selector: {
+        notebook: notebook,
+        flashcard: {
+          deck: deck
+        }
+      },
+    }
+    try {
+      let flashcardsResponse = await this.recordsDb.db.find(flashcardsQuery);
+      let flashcards: Array<any> | undefined = flashcardsResponse.docs
+      
+      return <Array<IRecord>><unknown>flashcards;
+
+    }
+    catch (err) {
+      logger.log({
+        level: 'error',
+        message: `Error getting flashcards: ${err}`
+      });
+    }
+    return new Array<IRecord>();
   }
 }
 

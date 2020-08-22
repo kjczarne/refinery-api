@@ -1,4 +1,5 @@
-import iBooks2Refinery from './ingress/iBooks';
+import relay from './ingressRelay';
+import { AppleiBooksEngine } from './handlers/iBooks';
 import yargs from 'yargs';
 
 const argv = yargs.option(
@@ -8,6 +9,7 @@ const argv = yargs.option(
   }
 ).argv;
 
-iBooks2Refinery(
+relay(
+  new AppleiBooksEngine(),
   argv.book
 );

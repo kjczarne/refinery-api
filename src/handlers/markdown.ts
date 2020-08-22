@@ -9,6 +9,8 @@ PouchDb.plugin(PouchdbFind);
 
 export class MdEngine extends BaseHandler {
 
+  static descriptor = 'Plain Markdown'
+
   /**
    * @function export
    * Exports queried flashcards to a Markdown summary.
@@ -31,15 +33,15 @@ export class MdEngine extends BaseHandler {
     let ids: Array<string> = Array<string>();
     let serialized: string = ''
     try {
-      let flashcardsResponse = await this.recordsDb.db.find(flashcardsQuery);
-      let flashcards: Array<any> | undefined = flashcardsResponse.docs
+      let flashcards: Array<IRecord> | undefined = await this.find(deck, notebook, diffFilter)
 
-      for (let fld of <Array<IRecord>><unknown>flashcards){
-        serialized += convertToMarkdown(fld, deck)
+      if (flashcards !== undefined) {
+        for (let fld of flashcards) {
+          serialized += convertToMarkdown(fld, deck)
+        }
+        writeFileSync(output, serialized, { encoding: 'utf-8' });
       }
-
-      writeFileSync(output, serialized, {encoding: 'utf-8'});
-
+      
       return ids;
 
     }

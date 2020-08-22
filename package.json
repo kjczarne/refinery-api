@@ -10,7 +10,8 @@
     "coverage": "rm ./debug/combined.log; rm ./debug/error.log; tsc; nyc --reporter=lcov --reporter=text mocha --package ./package.json \"./tests/**/*.ts\" --ui bdd",
     "mantest": "tsc; node --inspect-brk=9229 ./built/src/mantest.js",
     "adapter": "tsc; node ./built/ibooks/adapter.js",
-    "refine": "node ./built/ingressController.js",
+    "in": "node ./built/src/ingressController.js",
+    "out": "node ./built/src/egressController.js",
     "fakedb": "node ./built/src/fixtures/fakeDb.js",
     "fakedestroy": "node ./built/src/fixtures/destroyFakeDb.js"
   },
@@ -32,6 +33,7 @@
     "@types/puppeteer": "^2.0.1",
     "@types/sha1": "^1.1.2",
     "@types/winston": "^2.4.4",
+    "@types/yargs": "^15.0.5",
     "better-sqlite3": "^7.1.0",
     "core-js": "^3.2.1",
     "fast-csv": "^4.3.1",
@@ -47,7 +49,8 @@
     "typescript": "^3.9.5",
     "webpack": "^4.43.0",
     "winston": "^3.2.1",
-    "yaml": "^1.9.2"
+    "yaml": "^1.9.2",
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",

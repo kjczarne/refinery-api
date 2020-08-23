@@ -18,7 +18,7 @@ const argv = yargs.options(
       type: 'string',
       demandOption: true
     },
-    deck: {
+    set: {
       type: 'string',
       demandOption: true
     },
@@ -27,9 +27,9 @@ const argv = yargs.options(
       demandOption: true
     },
     diff: {
-      type: 'boolean',
+      type: 'number',
       demandOption: false,
-      default: true
+      default: undefined
     },
     flipped: {
       type: 'boolean',
@@ -54,18 +54,18 @@ switch (argv.what) {
     relay(
       new AndevEngine(config),
       argv.path,
-      argv.deck,
+      argv.set,
       argv.notebook,
-      '',
+      argv.diff,
       argv.flipped
     );
   case 'md': {
     relay(
       new MdEngine(config),
       argv.path,
-      argv.deck,
+      argv.set,
       argv.notebook,
-      '',
+      argv.diff,
       argv.flipped
     )
   }

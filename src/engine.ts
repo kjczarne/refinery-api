@@ -20,13 +20,13 @@ export function constructRecord(
     source: string,
     pageMap?: IPageMap,
     configEntity: IConfig | string | undefined = undefined,
-    deck: string = 'default',
+    set: string = 'default',
     notebook?: string,
     richContent: string = ''
 ): IRecord {
     let now: string = Date.now().toString();
     let configObj: any = config(configEntity)
-    let algorithmConfigObj: any = algorithmConfig(deck, configObj);
+    let algorithmConfigObj: any = algorithmConfig(set, configObj);
 
     let record: IRecord = {
         pageMap: pageMap,
@@ -37,8 +37,9 @@ export function constructRecord(
         _id: sha1(`${now}${dataField1}${dataField2}`),
         timestampCreated: Date.now(),
         timestampModified: Date.now(),
+        set: set,
+        pastExports: new Array<number>(),
         flashcard: {
-            deck: deck,
             scheduler: {
                 easinessFactor: algorithmConfigObj.new.initialFactor,
                 pastRevisions: new Array<number>(),
@@ -73,7 +74,7 @@ export function isRecord(obj: any): obj is IRecord{
  * the title, the highlight and the note. For instance in case of HTML
  * you will want to wrap the title with <h1> and </h1>
  * @param record IRecord or an Array of IRecord objects
- * @param title Title of the summary/deck
+ * @param title Title of the summary/set
  * @param wrapTitle Format wrapper for the title
  * @param wrapDataField1 Format wrapper for the highlighted text
  * @param wrapDataField2 Format wrapper for the note added
@@ -199,7 +200,7 @@ export async function constructRecords(
                 rec.source,
                 rec.pageMap,
                 rec.configEntity,
-                rec.deck,
+                rec.set,
                 rec.notebook,
                 rec.richContent
             );

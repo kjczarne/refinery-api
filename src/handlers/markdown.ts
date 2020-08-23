@@ -17,31 +17,26 @@ export class MdEngine extends BaseHandler {
    */
   async export(
     output: string,
-    deck: string = 'default',
+    set: string = 'default',
     notebook: string = 'default',
-    diffFilter: string = '',  // TODO: diff filter implementation e.g. diffs database?
+    diffFilter: number | undefined = undefined,  // TODO: diff filter implementation e.g. diffs database?
     flipped: boolean = false
   ): Promise<Array<string> | undefined> {
-    const flashcardsQuery: PouchDB.Find.FindRequest<IRecord> = {
-      selector: {
-        notebook: notebook,
-        flashcard: {
-          deck: deck
-        }
-      },
-    }
     let ids: Array<string> = Array<string>();
     let serialized: string = ''
     try {
-      let flashcards: Array<IRecord> | undefined = await this.find(deck, notebook, diffFilter)
+      let flashcards: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
 
       if (flashcards !== undefined) {
         for (let fld of flashcards) {
-          serialized += convertToMarkdown(fld, deck)
+          serialized += convertToMarkdown(fld, set)
         }
         writeFileSync(output, serialized, { encoding: 'utf-8' });
-      }
       
+        let updated = this._updateExportDiffs(flashcards);
+        await this.update(updated);
+      }
+
       return ids;
 
     }

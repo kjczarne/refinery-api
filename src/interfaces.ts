@@ -27,17 +27,19 @@ export interface IRecord {
   [x: string]: any,
   dataField1: string,
   dataField2: string,
-  note?: string
+  source: string,
   _id: string,
   _rev?: string,
-  richContent?: string,
   timestampCreated: number,
   timestampModified: number,
-  pageMap?: IPageMap,
-  source: string,
-  flashcard?: IFlashcard,  // data related to flashcard-based scheduling (custom internal scheduler)
+  pastExports: Array<number>,    // records batch exports to keep diffing easy
   notebook?: string,
-  linked?: string | Array<string>
+  set: string,
+  note?: string
+  richContent?: string,
+  pageMap?: IPageMap,
+  flashcard?: IFlashcard,          // data related to flashcard representation
+  linked?: string | Array<string>  // LATER: IDs of related IRecords
 }
 
 /**
@@ -45,8 +47,7 @@ export interface IRecord {
  * describes flashcard-related metadata of an `IRecord`
  */
 export interface IFlashcard {
-  deck: string,
-  scheduler?: ISchedulerProps
+  scheduler?: ISchedulerProps    // LATER: custom scheduler
 }
 
 export interface ISchedulerProps {

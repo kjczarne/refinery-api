@@ -25,15 +25,15 @@ export class AndevFldsEngine extends BaseHandler {
    */
   async export(
     output: string,
-    deck: string = 'default',
+    set: string = 'default',
     notebook: string = 'default',
-    diffFilter: string = '',  // TODO: diff filter implementation e.g. diffs database?
+    diffFilter: number | undefined = undefined,  // TODO: diff filter implementation e.g. diffs database?
     flipped: boolean = false
   ): Promise<Array<string> | undefined> {
     let ids: Array<string> = Array<string>();
     let serialized: string = ''
     try {
-      let flashcards: Array<IRecord> | undefined = await this.find(deck, notebook, diffFilter)
+      let flashcards: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
 
       if (flashcards !== undefined) {
         for (let fld of flashcards){
@@ -55,7 +55,11 @@ export class AndevFldsEngine extends BaseHandler {
           }
           serialized += row;
         }
+
         writeFileSync(output, serialized, {encoding: 'utf-8'});
+
+        let updated = this._updateExportDiffs(flashcards);
+        this.update(updated);
       }
 
       return ids;

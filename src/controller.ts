@@ -103,7 +103,7 @@ export class FlashcardRevisionController {
     // TODO: when called the scheduler should take the response, compute new EF and set next interval
     // move to `answeredStack` for database write at the end of the session
     if (flashcard.flashcard !== undefined){
-      new Scheduler(flashcard.flashcard.deck).setNextRevision(flashcard, responseQuality);
+      new Scheduler(flashcard.set).setNextRevision(flashcard, responseQuality);
       this.answeredStack.push(flashcard);
     }
   }

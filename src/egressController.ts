@@ -2,8 +2,10 @@
 import relay from './egressRelay';
 import AndevEngine from './handlers/andevFlashcards';
 import MdEngine from './handlers/markdown';
+import JsonEngine from './handlers/json';
 import yargs from 'yargs';
 import { DEFAULT_CONFIG_PATH } from './configProvider';
+import BaseHandler from './handlers/baseHandler';
 
 const argv = yargs.options(
   {
@@ -49,24 +51,30 @@ if (argv.config !== undefined) {
   var config = DEFAULT_CONFIG_PATH
 }
 
+const relayClosure = (engine: BaseHandler) => {
+  relay(
+    engine,
+    argv.path,
+    argv.set,
+    argv.notebook,
+    argv.diff,
+    argv.flipped
+  );
+}
+
 switch (argv.what) {
   case 'andev':
-    relay(
+    relayClosure(
       new AndevEngine(config),
-      argv.path,
-      argv.set,
-      argv.notebook,
-      argv.diff,
-      argv.flipped
     );
   case 'md': {
-    relay(
+    relayClosure(
       new MdEngine(config),
-      argv.path,
-      argv.set,
-      argv.notebook,
-      argv.diff,
-      argv.flipped
+    )
+  }
+  case 'json': {
+    relayClosure(
+      new JsonEngine(config),
     )
   }
 }

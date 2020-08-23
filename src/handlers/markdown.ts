@@ -11,43 +11,19 @@ export class MdEngine extends BaseHandler {
 
   static descriptor = 'Plain Markdown'
 
-  /**
-   * @function export
-   * Exports queried flashcards to a Markdown summary.
-   */
-  async export(
-    output: string,
-    set: string = 'default',
-    notebook: string = 'default',
-    diffFilter: number | undefined = undefined,  // TODO: diff filter implementation e.g. diffs database?
-    flipped: boolean = false
-  ): Promise<Array<string> | undefined> {
+  exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
     let ids: Array<string> = Array<string>();
     let serialized: string = ''
-    try {
-      let flashcards: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
-
-      if (flashcards !== undefined) {
-        for (let fld of flashcards) {
-          serialized += convertToMarkdown(fld, set)
-        }
-        writeFileSync(output, serialized, { encoding: 'utf-8' });
-      
-        let updated = this._updateExportDiffs(flashcards);
-        await this.update(updated);
-      }
-
-      return ids;
-
+    
+    for (let rec of records) {
+      serialized += convertToMarkdown(rec, rec.set)
     }
-    catch (err) {
-      logger.log({
-        level: 'error',
-        message: `Error getting flashcards: ${err}`
-      });
-    }
+
+    writeFileSync(output, serialized, { encoding: 'utf-8' });
+
     return ids;
   }
+    
 }
 
 export default MdEngine;

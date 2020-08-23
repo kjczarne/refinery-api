@@ -1,4 +1,4 @@
-import { BaseHandler } from './baseHandler';
+import { BaseHandler, ExportCallbackType } from './baseHandler';
 import { IRecord } from '../interfaces';
 import { logger, isUrl } from '../utils';
 import { readFileSync, writeFileSync } from 'fs';
@@ -15,64 +15,37 @@ export class AndevFldsEngine extends BaseHandler {
     return pr;
   }
 
-  /**
-   * @function export
-   * This creates an AnDev Flashcards CSV file that can be loaded into the Android app.
-   * AnDev's app uses the following formatting:
-   * Term1,Definition1
-   * Term2,Definition2,examples(optional),url(optional)
-   * Term3,Definition3
-   */
-  async export(
-    output: string,
-    set: string = 'default',
-    notebook: string = 'default',
-    diffFilter: number | undefined = undefined,  // TODO: diff filter implementation e.g. diffs database?
-    flipped: boolean = false
-  ): Promise<Array<string> | undefined> {
-    let ids: Array<string> = Array<string>();
-    let serialized: string = ''
-    try {
-      let flashcards: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
+  exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
+    let ids: Array<string> = new Array<string>();
+    let serialized: string = '';
 
-      if (flashcards !== undefined) {
-        for (let fld of flashcards){
-          ids.push(fld._id);
-          let row: string = ''
-          let url: string = ''
-          let examples: string = ''
-          if (isUrl(fld.source)){
-            url = ',' + fld.source
-          }
-          if (fld.note !== undefined) {
-            examples = ',' + fld.note;
-          }
-          let optionalFields: string = examples + url
-          if (flipped) {
-            row += fld.dataField2 + ',' + fld.dataField1 + optionalFields + '\n'
-          } else {
-            row += fld.dataField1 + ',' + fld.dataField2 + optionalFields + '\n'
-          }
-          serialized += row;
+    if (records !== undefined) {
+      for (let fld of records){
+        ids.push(fld._id);
+        let row: string = ''
+        let url: string = ''
+        let examples: string = ''
+        if (isUrl(fld.source)){
+          url = ',' + fld.source
         }
-
-        writeFileSync(output, serialized, {encoding: 'utf-8'});
-
-        let updated = this._updateExportDiffs(flashcards);
-        this.update(updated);
+        if (fld.note !== undefined) {
+          examples = ',' + fld.note;
+        }
+        let optionalFields: string = examples + url
+        if (flipped) {
+          row += fld.dataField2 + ',' + fld.dataField1 + optionalFields + '\n'
+        } else {
+          row += fld.dataField1 + ',' + fld.dataField2 + optionalFields + '\n'
+        }
+        serialized += row;
       }
 
-      return ids;
+      writeFileSync(output, serialized, {encoding: 'utf-8'});
+    }
 
-    }
-    catch (err) {
-      logger.log({
-        level: 'error',
-        message: `Error getting flashcards: ${err}`
-      });
-    }
     return ids;
   }
+
 }
 
 export default AndevFldsEngine;

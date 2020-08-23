@@ -4,6 +4,8 @@ import { IRecord } from '../interfaces';
 import { logger } from '../utils';
 import { create, map } from 'lodash';
 
+export type ExportCallbackType = (output: string, recs: Array<IRecord>, flipped: boolean)=>Array<string>;
+
 /**
  * @class BaseHandler base class for the handler classes
  */
@@ -28,23 +30,47 @@ export class BaseHandler {
     return pr;
   }
 
+  exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
+    return new Array<string>();
+  }
+
   /**
    * @async @function export exports a serialized set or set fragment
    * @param output output path or location where to store serialized record
+   * @param callback serializes the received IRecords to a file/buffer
    * @param set set name in Refinery Database
    * @param notebook notebook name in Refinery Database
    * @param diffFilter a filter that determines what portion of a set to export
    * @param flipped if true, the dataField2 should be treated as front
+   * @returns Array<string>, array of doc IDs that got extracted
    */
-  async export(  // TODO: generalize this by accepting a serialization callback
+  async export(
     output: string,
     set: string = 'default',
     notebook: string = 'default',
     diffFilter: number | undefined = undefined,
     flipped: boolean = false
-  ): Promise<any> {
-    let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
-    return pr;
+  ): Promise<Array<string> | undefined> {
+    let ids: Array<string> = Array<string>();
+    try {
+      let records: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
+
+      if (records !== undefined) {
+        ids = this.exportCallback(output, records, flipped);  // serialization to a file happens here
+        let updated = this._updateExportDiffs(records);
+        await this.update(updated);
+      }
+
+      return ids;
+
+    }
+    catch (err) {
+      logger.log({
+        level: 'error',
+        message: `Error getting flashcards: ${err}`
+      });
+    }
+    return ids;
   }
 
   /**
@@ -110,7 +136,7 @@ export class BaseHandler {
       selector: {
         notebook: notebook,
         flashcard: {
-          set: set  // TODO: filter out previously exported flashcards on demand
+          set: set
         }
       },
     }
@@ -118,13 +144,14 @@ export class BaseHandler {
       let flashcardsResponse = await this.recordsDb.db.find(flashcardsQuery);
       let flashcards: Array<IRecord> | undefined = <Array<IRecord>><unknown>flashcardsResponse.docs;
       if (diffFilter !== undefined) {
-        let filteredFlds: Array<any> = flashcards.filter((record)=>{
+        var filteredFlds: Array<IRecord> = flashcards.filter((record)=>{
           record.pastExports[-1] >= diffFilter
         })
+      } else {
+        var filteredFlds: Array<IRecord> = flashcards;
       }
-      
-      
-      return flashcards;
+
+      return filteredFlds;
 
     }
     catch (err) {

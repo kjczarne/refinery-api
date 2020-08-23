@@ -16,6 +16,7 @@ export class MdEngine extends BaseHandler {
     let serialized: string = ''
     
     for (let rec of records) {
+      ids.push(rec._id);
       serialized += convertToMarkdown(rec, rec.set)
     }
 

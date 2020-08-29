@@ -2,6 +2,7 @@ import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
 import { delay, logger } from './utils';
 import { config, algorithmConfig } from './configProvider';
+import { HtmlConvSpec, MdConvSpec } from './conversionSpecs';
 import PouchDb from 'pouchdb';
 
 /**
@@ -124,9 +125,9 @@ export function convertToMarkdown(
 ): string{
     return convert(record, 
                    title,
-                   ["# ", "\n\n"],
-                   ["", "\n"],
-                   ["", "\n\n"]);
+                   MdConvSpec.WRAP_TITLE(),
+                   MdConvSpec.WRAP_DF1(),
+                   MdConvSpec.WRAP_DF2());
 }
 
 /**
@@ -147,15 +148,15 @@ export function convertToHtml(
     cssDataField1Class: string = 'highlight',
     cssDataField2Class: string = 'note',
     cssTitleClass: string = 'title'
-): string{
-    let htmlCore: string = `<!DOCTYPE html>\n<html>\n<head>\n  <title>${title}</title>
-  <link rel="stylesheet" href="${cssFile}">\n</head>\n<body>\n`
-    htmlCore += convert(record, 
+): string {
+    let htmlCore: string = HtmlConvSpec.PRE(title, cssFile);
+    htmlCore += convert(
+        record, 
         title,
-        [`  <h1 class="${cssTitleClass}">`, "</h1>\n"],
-        [`    <p class="${cssDataField1Class}">`, "</p>\n"],
-        [`    <p class="${cssDataField2Class}">`, "</p>\n\n"]);
-    htmlCore += "</body></html>"
+        HtmlConvSpec.WRAP_TITLE(cssTitleClass),
+        HtmlConvSpec.WRAP_DF1(cssDataField1Class),
+        HtmlConvSpec.WRAP_DF2(cssDataField2Class));
+    htmlCore += HtmlConvSpec.TRAIL();
     return htmlCore;
 }
 

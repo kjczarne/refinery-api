@@ -23,7 +23,8 @@ export function constructRecord(
     configEntity: IConfig | string | undefined = undefined,
     set: string = 'default',
     notebook?: string,
-    richContent: string = ''
+    richContent: string = '',
+    note: string = ''
 ): IRecord {
     let now: string = Date.now().toString();
     let configObj: any = config(configEntity)
@@ -40,6 +41,7 @@ export function constructRecord(
         timestampModified: Date.now(),
         set: set,
         pastExports: new Array<number>(),
+        note: note,
         flashcard: {
             scheduler: {
                 easinessFactor: algorithmConfigObj.new.initialFactor,

@@ -1,8 +1,9 @@
-import { RefineryDatabaseWrapper } from '../engine';
+import { RefineryDatabaseWrapper, constructRecords } from '../engine';
 import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { IRecord } from '../interfaces';
 import { logger } from '../utils';
 import { create, map } from 'lodash';
+import dedent from 'ts-dedent';
 
 export type ExportCallbackType = (output: string, recs: Array<IRecord>, flipped: boolean)=>Array<string>;
 
@@ -21,18 +22,47 @@ export class BaseHandler {
     this.recordsDb = new RefineryDatabaseWrapper();
   }
 
-  async load(
+  async load(  //TODO: transfer to interface
     entity: any,
     set: string = 'default',
     notebook: string = 'default'
   ): Promise<any> {
-    let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
+    let pr: Promise<string> = new Promise<string>((resolve, reject) => { });
+    return pr;
+  }
+
+  /**
+   * @async @function `importCallback` facilitates bulk doc write
+   * @param arrayOfRecords Array of `IRecord` objects to write to Db
+   * @returns Promise<string>, first doc ID upon write to Db;
+   */
+  async importCallback(arrayOfRecords: Array<IRecord>){
+    let pr: Promise<string> = new Promise<string>((resolve, reject) => {
+      constructRecords(arrayOfRecords).then((response) => {
+          response.forEach((v) => { return JSON.stringify(v) });
+          this.recordsDb.db.bulkDocs(response).then((res) => {
+            logger.log({
+              level: 'silly',
+              message:
+                dedent`Added ${JSON.stringify(response)} to RefineryDb.
+                              Response: ${res}`
+            })
+          }).catch((err) => {
+            logger.log({
+              level: 'error',
+              message:
+                `Error PUTting docs into the RefineryDb: ${err}`
+            });
+          });
+          resolve(response[0]._id);
+        });
+      });
     return pr;
   }
 
   exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
     return new Array<string>();
-  }
+  }  // TODO: transfer to an interface
 
   /**
    * @async @function export exports a serialized set or set fragment
@@ -117,7 +147,7 @@ export class BaseHandler {
   async find(
     set: string = 'default',
     notebook: string = 'default',
-    diffFilter: number | undefined = undefined,  // TODO: diff filter implementation e.g. diffs database?
+    diffFilter: number | undefined = undefined,
   ): Promise<Array<IRecord> | undefined> {
     // const createIdxQuery: PouchDB.Find.CreateIndexOptions = {
     //   index: {

@@ -1,11 +1,7 @@
-import { IRecord } from '../interfaces';
-import { constructRecord, convertToMarkdown, convertToHtml, constructRecords } from '../engine';
-import { readFileSync, writeFileSync } from 'fs';
-import { delay, logger } from '../utils';
-import { queryPrepare, sqlQueryRun } from '../sql';
+import { logger } from '../utils';
+import { sqlQueryRun } from '../sql';
 import { dedent } from 'ts-dedent';
-import { RefineryDatabaseWrapper } from '../engine';
-import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
+import { DEFAULT_CONFIG_PATH } from '../configProvider';
 import { BaseHandler } from './baseHandler';
 
 export class AppleiBooksEngine extends BaseHandler {
@@ -55,23 +51,13 @@ export class AppleiBooksEngine extends BaseHandler {
 
           });
           // construct records:
-          constructRecords(filteredResponse2).then((response) => {
-            response.forEach((v) => { return JSON.stringify(v) });
-            this.recordsDb.db.bulkDocs(response).then((res) => {
-              logger.log({
-                level: 'silly',
-                message:
-                  dedent`Added ${JSON.stringify(response)} to RefineryDb.
-                                Response: ${res}`
-              })
-            }).catch((err) => {
-              logger.log({
-                level: 'error',
-                message:
-                  `Error PUTting docs into the RefineryDb: ${err}`
-              });
-            });
-            resolve(response[0]._id);
+          this.importCallback(filteredResponse2).then((res: string)=>{
+            resolve(res)
+          }).catch((err)=>{
+            logger.log({
+              level: 'error',
+              message: `importCallback threw an error: ${err}`
+            })
           });
         });
       });

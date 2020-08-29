@@ -2,7 +2,7 @@ import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
 import { delay, logger } from './utils';
 import { config, algorithmConfig } from './configProvider';
-import { HtmlConvSpec, MdConvSpec } from './conversionSpecs';
+import { HtmlConvSpec } from './conversionSpecs';
 import PouchDb from 'pouchdb';
 
 /**
@@ -112,53 +112,7 @@ export function convert(
     return serializedString;
 }
 
-/**
- * @function convertToMarkdown Converts IRecords to a Markdown
- * serialized string.
- * @param record IRecord or an Array of IRecord Objects
- * @param title Desired title of the Markdown document
- * @returns string
- */
-export function convertToMarkdown(
-    record: IRecord | Array<IRecord>,
-    title: string
-): string{
-    return convert(record, 
-                   title,
-                   MdConvSpec.WRAP_TITLE(),
-                   MdConvSpec.WRAP_DF1(),
-                   MdConvSpec.WRAP_DF2());
-}
-
-/**
- * @function convertToHtml Converts IRecords to an HTML document
- * serialized string.
- * @param record IRecord or an Array of IRecord Objects
- * @param title Desired title of the HTML Document
- * @param cssFile CSS file for styling
- * @param cssDataField1Class CSS class bound to Highlight elements
- * @param cssDataField2Class CSS class bound to Note elements
- * @param cssTitleClass CSS class bound to the title
- * @returns string
- */
-export function convertToHtml(
-    record: IRecord | Array<IRecord>,
-    title: string,
-    cssFile: string = 'default.css',
-    cssDataField1Class: string = 'highlight',
-    cssDataField2Class: string = 'note',
-    cssTitleClass: string = 'title'
-): string {
-    let htmlCore: string = HtmlConvSpec.PRE(title, cssFile);
-    htmlCore += convert(
-        record, 
-        title,
-        HtmlConvSpec.WRAP_TITLE(cssTitleClass),
-        HtmlConvSpec.WRAP_DF1(cssDataField1Class),
-        HtmlConvSpec.WRAP_DF2(cssDataField2Class));
-    htmlCore += HtmlConvSpec.TRAIL();
-    return htmlCore;
-}
+export function invert(){} //TODO: inverse converter
 
 // export function convertToFlashcard(
 //     record: IRecord | Array<IRecord>,

@@ -33,7 +33,7 @@ while (true) {
         let rec = constructRecord(df1, df2, "CLI", undefined, undefined, set, notebook, undefined, note);
         let wrapped = new Array<IRecord>(rec);
         let response = await new BaseEngine().importCallback(wrapped);
-        console.log(`Written as doc: ${response}`);
+        console.log(`Written with ID: ${response}`);
         rl.close();
       })
     })

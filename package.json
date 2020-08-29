@@ -12,6 +12,7 @@
     "adapter": "tsc; node ./built/ibooks/adapter.js",
     "in": "node ./built/src/ingressController.js",
     "out": "node ./built/src/egressController.js",
+    "add": "node ./built/src/manualInputController.js",
     "fakedb": "node ./built/src/fixtures/fakeDb.js",
     "fakedestroy": "node ./built/src/fixtures/destroyFakeDb.js"
   },

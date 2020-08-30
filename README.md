@@ -16,15 +16,15 @@ This project is in early stages of development.
 
 Various adapters (handlers/engines) are available but not all of them are bidirectional, e.g. it makes little sense to convert extracted e-book highlights back into iBooks.
 
-| Adapter name      | Egress available | Ingress available  | `--what` |
-|-------------------|------------------|--------------------|----------|
-| AnDev Flashcards  | Yes              | In development     | `andev`  |
-| Anki Flashcards   | In development   | In development     | n/a      |
-| Apple iBooks      | No               | Yes (macOS sqlite) | n/a      |
-| Audible           | No               | Planned for future | n/a      |
-| JSON              | Yes              | In development     | n/a      |
-| Markdown          | Yes              | In development     | `md`     |
-| Notion            | In development   | In development     | n/a      |
+| Adapter name      | Egress available | Ingress available      | `--what` |
+|-------------------|------------------|------------------------|----------|
+| AnDev Flashcards  | **Yes**          | In development         | `andev`  |
+| Anki Flashcards   | In development   | In development         | n/a      |
+| Apple iBooks      | No               | **Yes** (macOS sqlite) | n/a      |
+| Audible           | No               | Planned for future     | n/a      |
+| JSON              | In development   | In development         | n/a      |
+| Markdown          | **Yes**          | **Yes**                | `md`     |
+| Notion            | In development   | In development         | n/a      |
 
 ### Plans for the future
 

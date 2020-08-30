@@ -33,8 +33,8 @@ export class AppleiBooksEngine extends BaseHandler {
     this.pathToLibraryDb = this.config.ibooks.libraryDb;
   }
 
-  async load(bookName: string, set: string = bookName, notebook: string = 'default'): Promise<string> {
-    let pr: Promise<string> = new Promise<string>((resolve, reject) => {
+  async load(bookName: string, set: string = bookName, notebook: string = 'default'): Promise<Array<string>> {
+    let pr: Promise<Array<string>> = new Promise<Array<string>>((resolve, reject) => {
       sqlQueryRun(this.pathToLibraryDb, this._sqlQuery1).then((response1) => {
         sqlQueryRun(this.pathToAnnotationDb, this._sqlQuery2).then((response2) => {
           // filter out annotations that match the title in the function signature:
@@ -51,8 +51,8 @@ export class AppleiBooksEngine extends BaseHandler {
 
           });
           // construct records:
-          this.importCallback(filteredResponse2).then((res: string)=>{
-            resolve(res)
+          this.importCallback(filteredResponse2).then((res: Array<string>)=>{
+            resolve(res);
           }).catch((err)=>{
             logger.log({
               level: 'error',

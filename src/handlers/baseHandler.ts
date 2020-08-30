@@ -34,10 +34,10 @@ export class BaseHandler {
   /**
    * @async @function `importCallback` facilitates bulk doc write
    * @param arrayOfRecords Array of `IRecord` objects to write to Db
-   * @returns Promise<string>, first doc ID upon write to Db;
+   * @returns Promise<Array<string>> Array of IDs of docs written to the Db
    */
   async importCallback(arrayOfRecords: Array<IRecord>){
-    let pr: Promise<string> = new Promise<string>((resolve, reject) => {
+    let pr: Promise<Array<string>> = new Promise<Array<string>>((resolve, reject) => {
       constructRecords(arrayOfRecords).then((response) => {
           response.forEach((v) => { return JSON.stringify(v) });
           this.recordsDb.db.bulkDocs(response).then((res) => {
@@ -54,7 +54,7 @@ export class BaseHandler {
                 `Error PUTting docs into the RefineryDb: ${err}`
             });
           });
-          resolve(response[0]._id);
+          resolve(response.map((value: IRecord) => value._id));
         });
       });
     return pr;

@@ -3,13 +3,20 @@ import BaseHandler from './handlers/baseHandler';
 
 let f = (
     engine: BaseHandler,
-    resource: string
+    resource: string,
+    batch?: string,
+    notebook?: string
 )=>{
-    engine.load(resource).then(()=>{
+    engine.load(resource, batch, notebook).then(()=>{
         logger.log({
             level: 'info',
             message: `${resource} loaded from ${BaseHandler.descriptor} to Refinery Database.`
         });
+    }).catch((err)=>{
+        logger.log({
+            level: 'error',
+            message: `${resource} load failed from ${BaseHandler.descriptor}: ${err}`
+        })
     });
 }
 

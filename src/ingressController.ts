@@ -1,15 +1,35 @@
 import relay from './ingressRelay';
 import { AppleiBooksEngine } from './handlers/iBooks';
+import { MdEngine } from './handlers/markdown';
 import { DEFAULT_CONFIG_PATH } from './configProvider';
 import yargs from 'yargs';
 
 const argv = yargs.options(
   {
+    what: {
+      type: 'string',
+      demandOption: true,
+      choices: [
+        'md', 'ibooks'
+      ]
+    },
+    batch: {
+      type: 'string',
+      demandOption: false
+    },
+    notebook: {
+      type: 'string',
+      demandOption: false
+    },
     book: {
       type: 'string',
-      demandOption: true
+      demandOption: false
     },
     config: {
+      type: 'string',
+      demandOption: false
+    },
+    file: {
       type: 'string',
       demandOption: false
     }
@@ -22,7 +42,26 @@ if (argv.config !== undefined) {
   var config = DEFAULT_CONFIG_PATH
 }
 
-relay(
-  new AppleiBooksEngine(config),
-  argv.book
-);
+switch (argv.what) {
+  case 'ibooks': {
+    if (argv.book !== undefined) {
+      relay(
+        new AppleiBooksEngine(config),
+        argv.book
+      );
+    } else {
+      console.log("Error: `book` argument expected");
+    }
+    break;
+  }
+  case 'md': {
+    if (argv.file !== undefined) {
+      relay(
+        new MdEngine(config),
+        argv.file
+      );
+    } else {
+      console.log("Error: `file` argument expected");
+    }
+  }
+}

@@ -165,9 +165,7 @@ export class BaseHandler {
     const flashcardsQuery: PouchDB.Find.FindRequest<IRecord> = {
       selector: {
         notebook: notebook,
-        flashcard: {
-          batch: batch
-        }
+        batch: batch
       },
     }
     try {

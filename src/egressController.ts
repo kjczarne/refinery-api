@@ -20,7 +20,7 @@ const argv = yargs.options(
       type: 'string',
       demandOption: true
     },
-    set: {
+    batch: {
       type: 'string',
       demandOption: true
     },
@@ -55,7 +55,7 @@ const relayClosure = (engine: BaseHandler) => {
   relay(
     engine,
     argv.path,
-    argv.set,
+    argv.batch,
     argv.notebook,
     argv.diff,
     argv.flipped

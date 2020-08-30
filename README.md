@@ -35,4 +35,4 @@ Various adapters (handlers/engines) are available but not all of them are bidire
 
 1. Deploy a CouchDb instance (recommended Docker image for deployment speed)
 2. Expose the CouchDb instance credentials through the `configuration/.refinery.yaml`. Right now this is a plaintext file which isn't encrypted and a **very insecure** way of handling credentials but until a stable release appears this is the simplest way of injecting credentials into the Node app.
-3. Use `npm run in` for ingress and `npm run out` for egress, e.g. `npm run out -- --what=md --path=temp.md --set=default --notebook=default` -> converts the `default` set of records belonging to the `default` notebook to a Markdown file called `temp.md`.
+3. Use `npm run in` for ingress and `npm run out` for egress, e.g. `npm run out -- --what=md --path=temp.md --set=default --notebook=default` -> converts the `default` batch of records belonging to the `default` notebook to a Markdown file called `temp.md`.

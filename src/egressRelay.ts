@@ -4,34 +4,34 @@ import { BaseHandler } from './handlers/baseHandler';
 let f = (
     engine: BaseHandler,
     output: string,
-    set: string = 'default',
+    batch: string = 'default',
     notebook: string = 'default',
     diffFilter: number | undefined = undefined,
     flipped: boolean = false
 )=>{
     engine.export(
         output,
-        set,
+        batch,
         notebook,
         diffFilter,
         flipped
     ).then((response)=>{
         logger.log({
             level: 'info',
-            message: `Set ${set} exported to ${BaseHandler.descriptor}`
+            message: `Batch ${batch} exported to ${BaseHandler.descriptor}`
         });
         if (response !== undefined){
             for (let i of response){
                 logger.log({
                     level: 'silly',
-                    message: `Set: ${set}, ID: ${i}`
+                    message: `Batch: ${batch}, ID: ${i}`
                 });
             }
         }
     }).catch((err)=>{
         logger.log({
             level: 'error',
-            message: `Error exporting the set to ${BaseHandler.descriptor}: ${err}`
+            message: `Error exporting the batch to ${BaseHandler.descriptor}: ${err}`
         })
     });
 }

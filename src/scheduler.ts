@@ -86,10 +86,10 @@ export class Scheduler {
     config: any;
     algorithmWrapper: SchedulingAlgorithm;
 
-    constructor(set: string){
+    constructor(batch: string){
         this.config = config();
         this.algorithmWrapper = new SchedulingAlgorithm(
-            algorithmConfig(set, this.config)
+            algorithmConfig(batch, this.config)
         )
     }
 

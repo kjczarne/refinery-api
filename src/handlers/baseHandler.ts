@@ -24,7 +24,7 @@ export class BaseHandler {
 
   async load(  //TODO: transfer to interface
     entity: any,
-    set: string = 'default',
+    batch: string = 'default',
     notebook: string = 'default'
   ): Promise<any> {
     let pr: Promise<string> = new Promise<string>((resolve, reject) => { });
@@ -65,25 +65,25 @@ export class BaseHandler {
   }  // TODO: transfer to an interface
 
   /**
-   * @async @function export exports a serialized set or set fragment
+   * @async @function export exports a serialized batch or batch fragment
    * @param output output path or location where to store serialized record
    * @param callback serializes the received IRecords to a file/buffer
-   * @param set set name in Refinery Database
+   * @param batch batch name in Refinery Database
    * @param notebook notebook name in Refinery Database
-   * @param diffFilter a filter that determines what portion of a set to export
+   * @param diffFilter a filter that determines what portion of a batch to export
    * @param flipped if true, the dataField2 should be treated as front
    * @returns Array<string>, array of doc IDs that got extracted
    */
   async export(
     output: string,
-    set: string = 'default',
+    batch: string = 'default',
     notebook: string = 'default',
     diffFilter: number | undefined = undefined,
     flipped: boolean = false
   ): Promise<Array<string> | undefined> {
     let ids: Array<string> = Array<string>();
     try {
-      let records: Array<IRecord> | undefined = await this.find(set, notebook, diffFilter)
+      let records: Array<IRecord> | undefined = await this.find(batch, notebook, diffFilter)
 
       if (records !== undefined) {
         ids = this.exportCallback(output, records, flipped);  // serialization to a file happens here
@@ -110,12 +110,12 @@ export class BaseHandler {
    * This is an identity function that takes an array of records
    * and returns the same array of records, except it inserts a Date
    * object into `pastExports` Array. This is necessary to keep
-   * track of export diffs. Imagine you've exported some set
+   * track of export diffs. Imagine you've exported some batch
    * to some flashcard application and since then generated a new
-   * number of records for the same set in Refinery. If you
+   * number of records for the same batch in Refinery. If you
    * want to keep your revision deltas in any flashcards app
    * (which is crucial for spaced repetition), you will not want to
-   * delete the previous exported set or overwrite it but probably
+   * delete the previous exported batch or overwrite it but probably
    * put the new records in a separate batch or figure out a merge.
    * That's why we need to record export events and figure
    * out diffs based on these.
@@ -141,11 +141,11 @@ export class BaseHandler {
    * @function find
    * This performs a Mango query against the Db
    * and filters out relevant records.
-   * @param set set on the IRecord
+   * @param batch batch on the IRecord
    * @param notebook notebook on the IRecord
    */
   async find(
-    set: string = 'default',
+    batch: string = 'default',
     notebook: string = 'default',
     diffFilter: number | undefined = undefined,
   ): Promise<Array<IRecord> | undefined> {
@@ -166,7 +166,7 @@ export class BaseHandler {
       selector: {
         notebook: notebook,
         flashcard: {
-          set: set
+          batch: batch
         }
       },
     }

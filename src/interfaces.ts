@@ -34,8 +34,9 @@ export interface IRecord {
   timestampModified: number,
   pastExports: Array<number>,    // records batch exports to keep diffing easy
   notebook?: string,
-  set: string,
+  batch: string,
   note?: string
+  // future fields:
   richContent?: string,
   pageMap?: IPageMap,
   flashcard?: IFlashcard,          // data related to flashcard representation

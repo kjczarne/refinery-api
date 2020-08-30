@@ -33,7 +33,7 @@ export class AppleiBooksEngine extends BaseHandler {
     this.pathToLibraryDb = this.config.ibooks.libraryDb;
   }
 
-  async load(bookName: string, set: string = bookName, notebook: string = 'default'): Promise<Array<string>> {
+  async load(bookName: string, batch: string = bookName, notebook: string = 'default'): Promise<Array<string>> {
     let pr: Promise<Array<string>> = new Promise<Array<string>>((resolve, reject) => {
       sqlQueryRun(this.pathToLibraryDb, this._sqlQuery1).then((response1) => {
         sqlQueryRun(this.pathToAnnotationDb, this._sqlQuery2).then((response2) => {
@@ -46,7 +46,7 @@ export class AppleiBooksEngine extends BaseHandler {
             v['richContent'] = '';
             v['source'] = bookName;
             v['configPath'] = this.configPath;
-            v['set'] = set;
+            v['batch'] = batch;
             v['notebook'] = notebook
 
           });

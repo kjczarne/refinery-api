@@ -12,7 +12,7 @@ let minimalRecord: IRecord = {
     timestampModified: Date.now(),
     source: 'source',
     notebook: 'default',
-    set: 'default',
+    batch: 'default',
     pastExports: new Array<number>(),
     flashcard: {
         scheduler: {

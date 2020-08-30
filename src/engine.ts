@@ -22,7 +22,7 @@ export function constructRecord(
     pageMap?: IPageMap,
     configEntity: IConfig | string | undefined = undefined,
     batch: string = 'default',
-    notebook?: string,
+    notebook: string = 'default',
     richContent: string = '',
     note: string = ''
 ): IRecord {

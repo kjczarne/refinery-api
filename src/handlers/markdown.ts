@@ -40,7 +40,7 @@ export class MdEngine extends BaseHandler {
     let [batchMd, ...rest] = serializedFile.split(MdConvSpec.WRAP_TITLE()[1]);
     // if called with batch, use that, else, use the MD document title
     if (batch === undefined) {
-      var batchUsed = batchMd;
+      var batchUsed = batchMd.replace(/# ?/, '');
     } else {
       var batchUsed = batch;
     }

@@ -48,7 +48,9 @@ switch (argv.what) {
     if (argv.book !== undefined) {
       relay(
         new AppleiBooksEngine(config),
-        argv.book
+        argv.book,
+        argv.batch,
+        argv.notebook
       );
     } else {
       console.log("Error: `book` argument expected");
@@ -59,7 +61,9 @@ switch (argv.what) {
     if (argv.file !== undefined) {
       relay(
         new MdEngine(config),
-        argv.file
+        argv.file,
+        argv.batch,
+        argv.notebook
       );
     } else {
       console.log("Error: `file` argument expected");

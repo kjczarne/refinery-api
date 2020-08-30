@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import relay from './ingressRelay';
 import { AppleiBooksEngine } from './handlers/iBooks';
 import { MdEngine } from './handlers/markdown';

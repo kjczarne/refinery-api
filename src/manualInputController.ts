@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import readline from 'readline';
 import { constructRecord } from './engine';
 import BaseEngine from './handlers/baseHandler';

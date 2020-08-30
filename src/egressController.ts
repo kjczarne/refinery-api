@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // use process.argv here, first two args are the node command elements (node, script path)
 import relay from './egressRelay';
 import AndevEngine from './handlers/andevFlashcards';

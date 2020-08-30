@@ -17,9 +17,9 @@
     "fakedestroy": "node ./built/src/fixtures/destroyFakeDb.js"
   },
   "bin": {
-    "refinery-in": "node ./built/src/ingressController.js",
-    "refinery-out": "node ./built/src/egressController.js",
-    "refinery-add": "node ./built/src/manualInputController.js"
+    "refinery-in": "./built/src/ingressController.js",
+    "refinery-out": "./built/src/egressController.js",
+    "refinery-add": "./built/src/manualInputController.js"
   },
   "mocha": {
     "timeout": 5000,

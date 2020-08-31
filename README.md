@@ -1,6 +1,6 @@
 # Refinery
 
-![logo.png](./doc/RefineryLogo.png | width=100)
+<img src="./doc/RefineryLogo.png" alt="logo" width="100">
 
 Simple information snippet processor. Extracts information from e.g. E-Books and puts them into a self-managed CouchDb instance. On demand, records stored in the self-hosted database can be serialized to various formats like Markdown or Flashcards.
 

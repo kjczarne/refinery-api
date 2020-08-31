@@ -32,12 +32,14 @@ Various adapters (handlers/engines) are available but not all of them are bidire
 
 * direct HTML highlighting and notetaking with egress handler
 * mobile front-end for easy manual record creation
+* REST API for easy interfacing with the front end app
 
 ## How to use
 
 1. Deploy a CouchDb instance (recommended Docker image for deployment speed)
 2. Expose the CouchDb instance credentials through the `configuration/.refinery.yaml`. Right now this is a plaintext file which isn't encrypted and a **very insecure** way of handling credentials but until a stable release appears this is the simplest way of injecting credentials into the Node app.
-3. Use `refinery-in` for ingress and `refinery-out` for egress, e.g. `refinery-out --what=md --path=temp.md --set=default --notebook=default` -> converts the `default` batch of records belonging to the `default` notebook to a Markdown file called `temp.md`.
+3. Install this using `npm i -g .` when in the cloned repo's folder.
+4. Use `refinery-in` for ingress and `refinery-out` for egress, e.g. `refinery-out --what=md --path=temp.md --set=default --notebook=default` -> converts the `default` batch of records belonging to the `default` notebook to a Markdown file called `temp.md`.
 
 As of now, the most stable offering is the Markdown Ingress/Egress. Ingress will scan a Markdown file for an alembic emoji (⚗️) which should be placed right after the title of the section where you keep your paired *flashcards* and another one at the end of the section. For example:
 

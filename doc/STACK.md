@@ -2,7 +2,7 @@
 
 ## Why Node.JS?
 
-Development with Node is relatively lightweight and flexible enough for what we're trying to acheive. On top of that there is a great advantage of having unity in implementation language between the back-end and front-end, which is planned to be a React.JS/React Native application.
+Development with Node is relatively lightweight and flexible enough for what we're trying to acheive. Large speed of prototyping decreases time needed to actually have a working prototype. Also, inital plans assumed a React Native front-end for mobile, however all signs point towards Xamarin at this stage (MVVM rocks).
 
 ## Why TypeScript?
 
@@ -14,8 +14,8 @@ Refinery extracts information from one place and lets you rework it into somethi
 
 Our choice for a database is Apache CouchDB. We choose CouchDB for its high reliability, querying natively through HTTP, support for distributed computing and top-notch availability (no downtime policy). In terms of the CAP theorem this is an AP system which is *eventually consistent*. CouchDB can be easily scaled and if in the future the number of records increases greatly, it's possible to use distributed map-reduce-based computing paradigm.
 
-By design our CouchDB is decoupled from the project itself but it's eventually necessary to allow data transfer between two mediums.
+By design our CouchDB is decoupled from the project itself but it's eventually necessary to allow data transfer between the two mediums.
 
 ## Logging
 
-`winston` is our logger of choice as it's very simple to implement and very comprehensive when reading code. Read DEBUGGING.md to learn how to use it. We do not currently pass logs around to any sort of messaging broker but we see that as a possibility as we scale this project.
+`winston` is the logger of choice here as it's very simple to implement and very comprehensive when reading code. Read DEBUGGING.md to learn how to use it. I do not currently pass logs around to any sort of messaging broker but I see that as a possibility as we scale this project.

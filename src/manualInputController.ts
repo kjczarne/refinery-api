@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import readline from 'readline';
 import { constructRecord } from './engine';
-import BaseEngine from './handlers/baseHandler';
+import BaseEngine from './engines/baseEngine';
 import { IRecord } from './interfaces';
 
 // read in an endless loop until SIGKILL

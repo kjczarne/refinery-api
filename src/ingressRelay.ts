@@ -1,8 +1,8 @@
 import { logger } from './utils';
-import BaseHandler from './handlers/baseHandler';
+import BaseEngine from './engines/baseEngine';
 
 let f = (
-    engine: BaseHandler,
+    engine: BaseEngine,
     resource: string,
     batch?: string,
     notebook?: string
@@ -10,12 +10,12 @@ let f = (
     engine.load(resource, batch, notebook).then(()=>{
         logger.log({
             level: 'info',
-            message: `${resource} loaded from ${BaseHandler.descriptor} to Refinery Database.`
+            message: `${resource} loaded from ${BaseEngine.descriptor} to Refinery Database.`
         });
     }).catch((err)=>{
         logger.log({
             level: 'error',
-            message: `${resource} load failed from ${BaseHandler.descriptor}: ${err}`
+            message: `${resource} load failed from ${BaseEngine.descriptor}: ${err}`
         })
     });
 }

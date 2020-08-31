@@ -1,4 +1,4 @@
-import BaseEngine from './baseHandler';
+import BaseEngine from './baseEngine';
 import { IRecord } from '../interfaces';
 import { HtmlConvSpec } from '../conversionSpecs';
 import { convert } from '../engine';

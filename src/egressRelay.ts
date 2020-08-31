@@ -1,8 +1,8 @@
 import { logger } from './utils';
-import { BaseHandler } from './handlers/baseHandler';
+import { BaseEngine } from './engines/baseEngine';
 
 let f = (
-    engine: BaseHandler,
+    engine: BaseEngine,
     output: string,
     batch: string = 'default',
     notebook: string = 'default',
@@ -18,7 +18,7 @@ let f = (
     ).then((response)=>{
         logger.log({
             level: 'info',
-            message: `Batch ${batch} exported to ${BaseHandler.descriptor}`
+            message: `Batch ${batch} exported to ${BaseEngine.descriptor}`
         });
         if (response !== undefined){
             for (let i of response){
@@ -31,7 +31,7 @@ let f = (
     }).catch((err)=>{
         logger.log({
             level: 'error',
-            message: `Error exporting the batch to ${BaseHandler.descriptor}: ${err}`
+            message: `Error exporting the batch to ${BaseEngine.descriptor}: ${err}`
         })
     });
 }

@@ -1,4 +1,4 @@
-import { BaseHandler, ExportCallbackType } from './baseHandler';
+import { BaseEngine, ExportCallbackType } from './baseEngine';
 import { IRecord } from '../interfaces';
 import { logger, isUrl } from '../utils';
 import { readFileSync, writeFileSync } from 'fs';
@@ -6,7 +6,7 @@ import PouchDb from 'pouchdb';
 import PouchdbFind from 'pouchdb-find';
 PouchDb.plugin(PouchdbFind);
 
-export class JsonEngine extends BaseHandler {
+export class JsonEngine extends BaseEngine {
   
   static descriptor = 'JSON record'
 

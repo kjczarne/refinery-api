@@ -8,9 +8,9 @@ import dedent from 'ts-dedent';
 export type ExportCallbackType = (output: string, recs: Array<IRecord>, flipped: boolean)=>Array<string>;
 
 /**
- * @class BaseHandler base class for the handler classes
+ * @class BaseEngine base class for the handler classes
  */
-export class BaseHandler {
+export class BaseEngine {
   configPath: string;
   config: any;
   recordsDb: RefineryDatabaseWrapper;
@@ -192,4 +192,4 @@ export class BaseHandler {
   }
 }
 
-export default BaseHandler;
+export default BaseEngine;

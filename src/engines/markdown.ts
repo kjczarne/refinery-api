@@ -1,4 +1,4 @@
-import { BaseHandler } from './baseHandler';
+import { BaseEngine } from './baseEngine';
 import { IRecord } from '../interfaces';
 import { logger, isUrl } from '../utils';
 import { readFileSync, writeFileSync } from 'fs';
@@ -8,7 +8,7 @@ import PouchDb from 'pouchdb';
 import PouchdbFind from 'pouchdb-find';
 PouchDb.plugin(PouchdbFind);
 
-export class MdEngine extends BaseHandler {
+export class MdEngine extends BaseEngine {
 
   static descriptor = 'Plain Markdown'
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // use process.argv here, first two args are the node command elements (node, script path)
 import relay from './egressRelay';
-import AndevEngine from './handlers/andevFlashcards';
-import MdEngine from './handlers/markdown';
-import JsonEngine from './handlers/json';
+import AndevEngine from './engines/andevFlashcards';
+import MdEngine from './engines/markdown';
+import JsonEngine from './engines/json';
 import yargs from 'yargs';
 import { DEFAULT_CONFIG_PATH } from './configProvider';
-import BaseHandler from './handlers/baseHandler';
+import BaseEngine from './engines/baseEngine';
 
 const argv = yargs.options(
   {
@@ -52,7 +52,7 @@ if (argv.config !== undefined) {
   var config = DEFAULT_CONFIG_PATH
 }
 
-const relayClosure = (engine: BaseHandler) => {
+const relayClosure = (engine: BaseEngine) => {
   relay(
     engine,
     argv.path,

@@ -1,7 +1,7 @@
-export { MdEngine } from './handlers/markdown';
-export { AppleiBooksEngine } from './handlers/iBooks';
-export { JsonEngine } from './handlers/json';
-export { AndevFldsEngine } from './handlers/andevFlashcards';
+export { MdEngine } from './engines/markdown';
+export { AppleiBooksEngine } from './engines/iBooks';
+export { JsonEngine } from './engines/json';
+export { AndevFldsEngine } from './engines/andevFlashcards';
 
 export * from './interfaces';
 

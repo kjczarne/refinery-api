@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import relay from './ingressRelay';
-import { AppleiBooksEngine } from './handlers/iBooks';
-import { MdEngine } from './handlers/markdown';
+import { AppleiBooksEngine } from './engines/iBooks';
+import { MdEngine } from './engines/markdown';
 import { DEFAULT_CONFIG_PATH } from './configProvider';
 import yargs from 'yargs';
 

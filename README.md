@@ -59,3 +59,5 @@ As of now, the most stable offering is the Markdown Ingress/Egress. Ingress will
     Model-View-Adapter: like MVC but Model is decoupled from the View and there's an Adapter mediating between the two. This is used when we want to prevent UI state changes from affecting data handling in the model directly. 
 ⚗️
 ```
+
+The pattern of bullet lists starting with dashes and indented answer blocks is for now obligatory to use. This is the exact format that Notion dumps its toggle lists, so you can already use MD files exported from Notion until the native API gets released and lets me play around the topics of sync and smarter format handling.

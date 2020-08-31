@@ -1,4 +1,4 @@
-# Refinery.JS
+# Refinery
 
 ![logo.png](./doc/RefineryLogo.png)
 

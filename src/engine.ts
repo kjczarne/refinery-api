@@ -86,7 +86,9 @@ export function convert(
     title: string,
     wrapTitle: [string, string],
     wrapDataField1: [string, string],
-    wrapDataField2: [string, string]
+    wrapDataField2: [string, string],
+    footer: string = "",
+    wrapFooter: [string, string] = ["", ""]
 ){
     let serializedString: string = "";
     // callback to format output string:
@@ -109,6 +111,7 @@ export function convert(
             cb(x, "dataField2", wrapDataField2[0], wrapDataField2[1]);
         });
     }
+    serializedString += `${wrapFooter[0]}${footer}${wrapFooter[1]}`;
     return serializedString;
 }
 

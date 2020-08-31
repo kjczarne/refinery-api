@@ -6,6 +6,8 @@ class ConvSpec {
     static WRAP_DF1: any;
     static WRAP_DF2: any;
     static TRAIL: any;
+    static MAGIC_MARKER = () => "⚗️";
+    static WRAP_FOOTER: any;
 }  // LATER: a better way of handling static interfaces
 
 export class HtmlConvSpec extends ConvSpec{
@@ -23,11 +25,14 @@ export class HtmlConvSpec extends ConvSpec{
         [`    <p class="${cssDataField2Class}">`, "</p>\n\n"];
 
     static TRAIL = () => "</body></html>";
+
 }
 
 export class MdConvSpec extends ConvSpec {
     static PRE = () => ""
-    static WRAP_TITLE = (): [string, string] => ["# ", "\n\n"]
-    static WRAP_DF1 = (): [string, string] => ["", "\n"]
-    static WRAP_DF2 = (): [string, string] => ["", "\n\n"]
+    static WRAP_TITLE = (): [string, string] => ["# ", ` ${MdConvSpec.MAGIC_MARKER()}\n\n`]
+    static WRAP_DF1 = (): [string, string] => ["- ", "\n\n"]
+    static WRAP_DF2 = (): [string, string] => ["    ", "\n\n"]
+    static WRAP_FOOTER = (): [string, string] => ["", `${MdConvSpec.MAGIC_MARKER()}\n`]
+    static MINIMUM_CHARACTERS = 4;  // minimum chars per field to treat as sth to be parsed
 }

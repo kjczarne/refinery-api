@@ -27,7 +27,9 @@ export class MdEngine extends BaseEngine {
                   title,
                   MdConvSpec.WRAP_TITLE(),
                   MdConvSpec.WRAP_DF1(),
-                  MdConvSpec.WRAP_DF2());
+                  MdConvSpec.WRAP_DF2(),
+                  "",
+                  MdConvSpec.WRAP_FOOTER());
   }
 
   convertFromMarkdown(
@@ -36,19 +38,36 @@ export class MdEngine extends BaseEngine {
     batch?: string
     ): Array<IRecord> {
     let outputArray: Array<IRecord> = new Array<IRecord>();
-    // peel off the title
-    let [batchMd, ...rest] = serializedFile.split(MdConvSpec.WRAP_TITLE()[1]);
+    let [preBlock, block, ...postBlock] = serializedFile.split(MdConvSpec.MAGIC_MARKER());
+    let titlePrep = preBlock.split(MdConvSpec.WRAP_TITLE()[0]);
+    let batchMd = titlePrep[titlePrep.length - 1];
     // if called with batch, use that, else, use the MD document title
     if (batch === undefined) {
-      var batchUsed = batchMd.replace(/# ?/, '');
+      var batchUsed = batchMd.trim();  // clean off whitespace
     } else {
       var batchUsed = batch;
     }
-    let joinBack = rest.join(MdConvSpec.WRAP_TITLE()[1]);
-    let splitRecords = joinBack.split(MdConvSpec.WRAP_DF2()[1]);
-    for (let i = 0; i < splitRecords.length; i++) {
-      let [df1, df2] = splitRecords[i].split(MdConvSpec.WRAP_DF1()[1]);
-      let record = constructRecord(df1, df2, 'Md', undefined, undefined, batchUsed, notebook);
+    // strip all the newlines
+    let strippedBlock = block.trim();
+    // split the block on dash or asterisk list
+    let splitBlock = strippedBlock.split(MdConvSpec.WRAP_DF1()[0]);
+    for (let i = 0; i < splitBlock.length; i++) {
+      let [df1, df2] = splitBlock[i].split(MdConvSpec.WRAP_DF1()[1]+MdConvSpec.WRAP_DF2()[0]);
+      if (df1 !== undefined || df2 !== undefined) {
+        if (df1.length < MdConvSpec.MINIMUM_CHARACTERS || 
+            df2.length < MdConvSpec.MINIMUM_CHARACTERS) {
+          continue;
+        }
+      }
+      let record = constructRecord(
+        df1.trim(), 
+        df2.trim(), 
+        'Md', 
+        undefined, 
+        undefined, 
+        batchUsed, 
+        notebook
+      );
       outputArray.push(record);
     }
     return outputArray;

@@ -5,6 +5,7 @@ debug
 .vscode
 *.log
 temp.*
+localFiles
 
 # Node
 node_modules

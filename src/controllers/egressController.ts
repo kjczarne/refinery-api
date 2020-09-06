@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // use process.argv here, first two args are the node command elements (node, script path)
-import relay from './egressRelay';
-import AndevEngine from './engines/andevFlashcards';
-import MdEngine from './engines/markdown';
-import JsonEngine from './engines/json';
+import relay from '../relays/egressRelay';
+import AndevEngine from '../engines/andevFlashcards';
+import MdEngine from '../engines/markdown';
+import JsonEngine from '../engines/json';
 import yargs from 'yargs';
-import { DEFAULT_CONFIG_PATH } from './configProvider';
-import BaseEngine from './engines/baseEngine';
+import { DEFAULT_CONFIG_PATH } from '../configProvider';
+import BaseEngine from '../engines/baseEngine';
 
 const argv = yargs.options(
   {

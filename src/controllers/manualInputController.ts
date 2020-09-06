@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import readline from 'readline';
-import { constructRecord } from './engine';
-import BaseEngine from './engines/baseEngine';
-import { IRecord } from './interfaces';
+import { constructRecord } from '../engine';
+import BaseEngine from '../engines/baseEngine';
+import { IRecord } from '../interfaces';
 
 // read in an endless loop until SIGKILL
 const rl = readline.createInterface({

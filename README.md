@@ -33,6 +33,8 @@ Various adapters (handlers/engines) are available but not all of them are bidire
 * direct HTML highlighting and notetaking with egress handler
 * mobile front-end for easy manual record creation
 * REST API for easy interfacing with the front end app
+* flexible specification, e.g. provide own regex pattern to parse MD files
+* user-defined plugins
 
 ## How to use
 

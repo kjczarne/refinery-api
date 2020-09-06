@@ -16,10 +16,10 @@ export class BaseEngine {
   recordsDb: RefineryDatabaseWrapper;
   static descriptor: string;
 
-  constructor(configPath: string = DEFAULT_CONFIG_PATH) {
+  constructor(username?: string, password?: string, configPath: string = DEFAULT_CONFIG_PATH) {
     this.configPath = configPath;
     this.config = config(configPath);
-    this.recordsDb = new RefineryDatabaseWrapper();
+    this.recordsDb = new RefineryDatabaseWrapper(username, password);
   }
 
   async load(  //TODO: transfer to interface

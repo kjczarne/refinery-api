@@ -1,8 +1,8 @@
-import { IRecord, displayCallback } from "./interfaces";
-import { RefineryDatabaseWrapper } from "./engine";
-import { config } from './configProvider';
-import { Scheduler } from './scheduler';
-import { logger } from "./utils";
+import { IRecord, displayCallback } from "../interfaces";
+import { RefineryDatabaseWrapper } from "../engine";
+import { config } from '../configProvider';
+import { Scheduler } from '../scheduler';
+import { logger } from "../utils";
 import PouchDb from 'pouchdb';
 import PouchdbFind from 'pouchdb-find';
 PouchDb.plugin(PouchdbFind);
@@ -17,9 +17,9 @@ export class FlashcardRevisionController {
   sessionStart?: Date;
   sessionEnd?: Date;
 
-  constructor() {
+  constructor(username?: string, password?: string) {
     this.config = config();
-    this.recordsDb = new RefineryDatabaseWrapper();
+    this.recordsDb = new RefineryDatabaseWrapper(username, password);
   }
 
   // For convenience steps that the controller should follow

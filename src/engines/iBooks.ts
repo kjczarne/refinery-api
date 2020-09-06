@@ -27,8 +27,8 @@ export class AppleiBooksEngine extends BaseEngine {
     FROM ZAEANNOTATION;
     `.replace(/\n/g, ' ');
   
-  constructor(configPath: string = DEFAULT_CONFIG_PATH) {
-    super(configPath);
+  constructor(username?: string, password?: string, configPath: string = DEFAULT_CONFIG_PATH) {
+    super(username, password, configPath);
     this.pathToAnnotationDb = this.config.ibooks.annotationsDb;
     this.pathToLibraryDb = this.config.ibooks.libraryDb;
   }

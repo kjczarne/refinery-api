@@ -2,7 +2,7 @@ import { RefineryDatabaseWrapper } from '../engine';
 import { IRecord } from '../interfaces';
 import { logger } from '../utils';
 
-const db = new RefineryDatabaseWrapper();
+const db = new RefineryDatabaseWrapper("admin", "password");
 
 let minimalRecord: IRecord = {
     dataField1: "lorem ipsum",

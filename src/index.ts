@@ -15,4 +15,4 @@ export {
 
 export { Scheduler } from './scheduler';
 
-export { FlashcardRevisionController } from './revisionController';
+export { FlashcardRevisionController } from './controllers/revisionController';

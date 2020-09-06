@@ -1,7 +1,7 @@
 import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
 import { delay, logger } from './utils';
-import { config, algorithmConfig } from './configProvider';
+import { config, algorithmConfig, DEFAULT_CONFIG_PATH } from './configProvider';
 import { HtmlConvSpec } from './conversionSpecs';
 import PouchDb from 'pouchdb';
 
@@ -172,25 +172,28 @@ export async function constructRecords(
 export class RefineryDatabaseWrapper {
     config: any;
     // auth: Promise<nano.DatabaseAuthResponse>;
-    // server: nano.DatabaseScope;
+    server: string;
+    name: string;
     db: PouchDB.Database;
 
-    constructor(){
-        this.config = config();
-        // TODO: more secure handling of the database authentication:
-        const opts = {
+    constructor(username?: string, password?: string, configPath: string = DEFAULT_CONFIG_PATH) {
+        this.config = config(configPath);
+        var opts = {
             auth: {
-                username: this.config.refinery.database.user,
-                password: this.config.refinery.database.password
+                username: process.env.REFINERY_USER || "none",
+                password: process.env.REFINERY_PASSWORD || "none"
             }
         }
-        const server = this.config.refinery.database.databaseServer;
-        const name = this.config.refinery.database.databaseName;
-        const db = new PouchDb(server + name, opts)
+        
+        // looks for CTOR values, falls back onto env otherwise:
+        username && password ? opts = { auth: { username: username, password: password } } : opts = opts;
+        this.server = this.config.refinery.database.databaseServer;
+        this.name = this.config.refinery.database.databaseName;
+        const db = new PouchDb(this.server + this.name, opts)
         // this.auth = couchDb.auth(username, userpass);
         // this.server = server;
         this.db = db;
-        // TODO: local db and sync methods
+        // LATER: local db and sync methods
     }
 }
 

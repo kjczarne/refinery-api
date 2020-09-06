@@ -1,5 +1,5 @@
-import { logger } from './utils';
-import BaseEngine from './engines/baseEngine';
+import { logger } from '../utils';
+import BaseEngine from '../engines/baseEngine';
 
 let f = (
     engine: BaseEngine,

@@ -5,7 +5,6 @@ import relayIngress from '../relays/ingressRelay';
 import AndevEngine from '../engines/andevFlashcards';
 import MdEngine from '../engines/markdown';
 import JsonEngine from '../engines/json';
-import { DEFAULT_CONFIG_PATH } from '../configProvider';
 import BaseEngine from '../engines/baseEngine';
 import { ExpectedParametersEgress, ExpectedParametersIngress } from './interfaces';
 import { AppleiBooksEngine } from '../engines/iBooks';
@@ -18,38 +17,6 @@ export class ApiController {
   constructor(username?: string, password?: string) {
     this._username = username;
     this._password = password;
-  }
-
-  async uploadFiles(req: any, res: any, destination: string) {
-    try {
-      if(!req.files) {
-        res.send({
-            status: false,
-            message: 'No file uploaded'
-        });
-      } else {
-        //Use the name of the input field (i.e. "file") to retrieve the uploaded file
-        let file = req.files.file;
-        
-        //Use the mv() method to place the file in upload directory (i.e. "uploads")
-        let path = destination + '/' + file.name;
-        file.mv(path);
-
-        //send response
-        res.send({
-          status: true,
-          message: 'File is uploaded',
-          data: {
-              name: file.name,
-              mimetype: file.mimetype,
-              size: file.size
-          }
-        });
-        return path;
-      }
-    } catch (err) {
-      res.status(500).send(err);
-    }
   }
 
   // config assumed to be specified on deployment of the server

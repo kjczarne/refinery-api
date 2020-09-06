@@ -11,8 +11,8 @@ import { config as cfg } from './configProvider';
 import { RefineryDatabaseWrapper } from './engine';
 import ApiController from './controllers/apiController';
 import cors from 'cors';
-import fileUpload from 'express-fileupload';
 import { ExpectedParametersIngress, ExpectedParametersEgress} from './controllers/interfaces';
+import multer from 'multer';
 
 const config = cfg();
 const dbName = config.refinery.database.databaseName;
@@ -29,7 +29,6 @@ if (secret === "none") {
   throw new Error("Set the REFINERY_SECRET env variable first!");
 }
 
-app.use(fileUpload({ createParentPath: true }));
 app.use(cors());
 app.use(express.static('public'));
 app.use(session({
@@ -43,7 +42,7 @@ app.use(session({
 }));
 app.use(flash());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -133,27 +132,27 @@ app.all('/loginFailed', (req: any, res) => {
 // ===================================================================================
 // BASIC CRUD METHODS:
 // ===================================================================================
-app.get(`/doc/:docId`, async (req: any, res) => {
+app.get(`/doc`, async (req: any, res) => {
   // request: document ID, response: document
-  let doc = await db?.db.get(req.params.docId);
+  let doc = await db?.db.get(req.query.docId);
   res.json(doc);
 });
 
-app.get(`/batch/:batch`, async (req: any, res) => {
+app.get(`/batch`, async (req: any, res) => {
   // request: batch name, response: all docs in the batch
-  let docs = await db?.db.find({ selector: { batch: req.params.batch } });
+  let docs = await db?.db.find({ selector: { batch: req.query.batch } });
   res.json(docs);
 });
 
-app.get(`/notebook/:notebook`, async (req: any, res) => {
+app.get(`/notebook`, async (req: any, res) => {
   // request: batch name, response: all docs in the batch
-  let docs = await db?.db.find({ selector: { batch: req.params.notebook } });
+  let docs = await db?.db.find({ selector: { batch: req.query.notebook } });
   res.json(docs);
 });
 
-app.get(`/find/:selector`, async (req: any, res) => {
+app.get(`/find`, async (req: any, res) => {
   // request: batch name, response: all docs in the batch
-  let docs = await db?.db.find(req.params.selector);
+  let docs = await db?.db.find(req.query.selector);
   res.json(docs);
 });
 // ===================================================================================
@@ -163,14 +162,16 @@ app.get(`/find/:selector`, async (req: any, res) => {
 // COUCH RELAY METHODS:
 // ===================================================================================
 
-app.all(`/couch/:query`,
+app.all(`/couch`,
+  // call this like: /couch?url=/_all_docs
   async (req: any, res) => {
     let theURL = url(
       req.session.passport.user.id,
       req.session.passport.user.password  // these values are injected by passport.js
     );
+    console.log(req.query);
     let responseObj = await fetch(
-      theURL
+      theURL + req.query.url
     );
     let response = JSON.parse(await responseObj.text());
     res.json(response);
@@ -181,47 +182,36 @@ app.all(`/couch/:query`,
 // ===================================================================================
 // REFINERY IN/OUT METHODS:
 // ===================================================================================
-
-
 // POST methods should always trigger ingress, GET always egress.
-// TODO: use multer
-// app.post(`/refine/:what`, async function(req, res){
-//   let path = await controller?.uploadFiles(req, res, config.loc);
-//   if (!req.params.what) {
-//     // if format not explicitly stated, send it to the server and warn
-//     res.send({
-//       "warning": `You haven't specified the file format, saving in: ${config.loc}`
-//     });
-//   } else {
-//     const parameters: Exclude<ExpectedParametersIngress, { config: string }> 
-//       & Required<Pick<ExpectedParametersIngress, "resource">> = {
-//         what: <any>req.params.what,
-//         resource: path || "",
-//         batch: req.body.batch,
-//         notebook: req.body.notebook
-//     }
-//     controller?.refineIn(parameters);
-//     res.send("Loaded.")
-//   }
-// });
+const upload = multer({ dest: config.refinery.files.loc });
+
+app.post(`/refine`, upload.single('file'), function(req, res){
+  if (!req.query.what) {
+    // if format not explicitly stated, send it to the server and warn
+    res.send({
+      "warning": `You haven't specified the file format, saving in: ${config.files.loc}`
+    });
+  } else {
+    const parameters: Exclude<ExpectedParametersIngress, { config: string }> 
+      & Required<Pick<ExpectedParametersIngress, "resource">> = {
+        what: <any>req.query.what,
+        resource: req.file.path || "",
+        batch: req.body.batch,
+        notebook: req.body.notebook
+    }
+    controller?.refineIn(parameters);
+    res.send("Loaded.")
+  }
+  res.status(200)
+});
 
 // TODO: use `sendFile` on GET
-// app.get('/refine/:what', async function(req, res){
-//   let path = await controller?.uploadFiles(req, res, config.loc);
-//   if (!req.params.what) {
-//     // if format not explicitly stated, send it to the server and warn
-//     res.send({
-//       "warning": `You haven't specified the file format, saving in: ${config.loc}`
-//     });
-//   } else {
-//     const parameters: Exclude<ExpectedParametersEgress, { config: string }> = {
-//         what: <any>req.params.what,
-//         resource: path || "",
-//         batch: req.body.batch,
-//         notebook: req.body.notebook
-//     }
-//     controller?.refineOut(parameters);
-//   }
+app.get('/refine', async (req, res) => {
+  res.send("GET")
+})
+
+// app.get('/refine', async (req, res) => {
+//   res.send("GET")
 // })
 
 // ===================================================================================

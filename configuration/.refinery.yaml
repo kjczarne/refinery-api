@@ -11,3 +11,49 @@ refinery:
 ibooks:
   annotationsDb: "./tests/res/ibooks/ibooks_db_mock.sqlite"
   libraryDb: "./tests/res/ibooks/ibooks_library_mock.sqlite"
+phlower:
+  # notebooks organize decks as decks can be summarized into Markdown
+  # or HTML documents
+  notebooks:
+    - cfgId: default
+  decks:
+    - cfgId: default
+      algorithm: default
+    # - cfgId: custom
+  algorithms:
+    - cfgId: default
+      new:
+        maxPerDay: 20
+        startingDelays: [1, 10]    # TODO: get rid of discrepancy between delays and intervals, this is confusing and superfluous
+        startingIntervals: [1, 4]
+        initialFactor: 2.5
+        order: random
+      fail:
+        failsUntilLeech: 8
+        minLeechInterval: 1
+        delays: [10]
+        leechAction: 0
+        multiplyInterval: 0
+      rev: 
+        maxPerDay: 100
+        fuzz: 0.05
+        multiplyInterval: 1
+        maxInterval: 365
+        initialEaseFactorMultiplier: 1.3
+        minSpace: 1
+      timer: true
+      maxTimeSpentOnCard: 60
+      autoplayAudio: true
+      replayAudioWhenFlipped: true
+    # - cfgId: custom
+  formatting:
+    - cfgId: default
+      fields:
+        - name: Front
+          css: >
+            font-family: arial;
+            color: red;
+        - name: Back
+          css: >
+            font-family: arial;
+            color: blue;

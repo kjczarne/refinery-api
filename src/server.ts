@@ -205,14 +205,55 @@ app.post(`/refine`, upload.single('file'), function(req, res){
   res.status(200)
 });
 
-// TODO: use `sendFile` on GET
-app.get('/refine', async (req, res) => {
-  res.send("GET")
-})
-
-// app.get('/refine', async (req, res) => {
-//   res.send("GET")
-// })
+app.get('/refine', async (req: any, res) => {
+  var options = {
+    root: config.refinery.files.loc,
+    dotfiles: 'deny',
+    headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true
+    }
+  }
+  if (!req.query.what) {
+    // if format not explicitly stated, send it to the server and warn
+    res.send({
+      "error": `You haven't specified the file format you want to obtain.`
+    });
+  } else {
+    const parameters: Exclude<ExpectedParametersEgress, { config: string }> = {
+        what: <any>req.query.what,
+        path: options.root + '/' + req.query.filename,
+        batch: req.query.batch,
+        notebook: req.query.notebook,
+        diff: req.query.diff,
+        flipped: req.query.flipped
+    }
+    console.log(options.root)
+    console.log(parameters.path)
+    await controller?.refineOut(parameters);
+    res.sendFile(
+      req.query.filename,  // this looks for a filename in local files folder (specified in config)
+      options, 
+      function (err) {
+        if (err) {
+          let msg = `An error occured: ${err}`
+          logger.log({
+            level: 'error',
+            message: msg
+          });
+          console.log(msg);
+        } else {
+          let msg = `Sent: ${req.query.filename}`;
+          logger.log({
+            level: 'info',
+            message: msg
+          });
+          console.log(msg);
+        }
+      }
+    );
+  }
+});
 
 // ===================================================================================
 

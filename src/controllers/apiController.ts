@@ -27,7 +27,7 @@ export class ApiController {
     engine: BaseEngine,
     parameters: Exclude<ExpectedParametersEgress, { config: string }>
   ) {
-    relayEgress(
+    return relayEgress(
       engine,
       parameters.path,
       parameters.batch,
@@ -42,7 +42,7 @@ export class ApiController {
     parameters: Exclude<ExpectedParametersIngress, { config: string }> 
       & Required<Pick<ExpectedParametersIngress, "resource">>
   ) {
-    relayIngress(
+    return relayIngress(
       engine,
       parameters.resource,
       parameters.batch,
@@ -77,7 +77,7 @@ export class ApiController {
   refineOut(parameters: Exclude<ExpectedParametersEgress, { config: string }>) {
     switch (parameters.what) {
       case 'andev':
-        this.relayClosureEgress(
+        return this.relayClosureEgress(
           new AndevEngine(
             this._username,
             this._password
@@ -85,7 +85,7 @@ export class ApiController {
           parameters
         );
       case 'md': {
-        this.relayClosureEgress(
+        return this.relayClosureEgress(
           new MdEngine(
             this._username,
             this._password
@@ -94,7 +94,7 @@ export class ApiController {
         )
       }
       case 'json': {
-        this.relayClosureEgress(
+        return this.relayClosureEgress(
           new JsonEngine(
             this._username,
             this._password

@@ -10,9 +10,10 @@ export class JsonEngine extends BaseEngine {
   
   static descriptor = 'JSON record'
 
-  async load(): Promise<string> {  // TODO: JSON ingress
-    let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
-    return pr;
+  async load(filePath: string, batch?: string, notebook?: string): Promise<Array<string>> {
+    let f: string = readFileSync(filePath, {encoding: 'utf-8'});
+    let records: Array<IRecord> = JSON.parse(f);
+    return await this.importCallback(records);
   }
 
   exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {

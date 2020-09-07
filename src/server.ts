@@ -23,7 +23,7 @@ const url = (username: string, password: string) =>
 
 
 const app = express()
-const port = process.env.REFINERY_SERVER_PORT || 6969
+const port = process.env.REFINERY_SERVER_PORT || 42069
 const secret = process.env.REFINERY_SECRET || "none"
 if (secret === "none") {
   throw new Error("Set the REFINERY_SECRET env variable first!");

@@ -1,6 +1,6 @@
 import { RefineryDatabaseWrapper } from '../engine';
 import { IRecord } from '../interfaces';
-import { logger } from '../utils';
+import { logger } from '../utilities/utils';
 
 const db = new RefineryDatabaseWrapper("admin", "password");
 

@@ -1,5 +1,5 @@
-import { logger } from '../utils';
-import { sqlQueryRun } from '../sql';
+import { logger } from '../utilities/utils';
+import { sqlQueryRun } from '../utilities/sql';
 import { dedent } from 'ts-dedent';
 import { DEFAULT_CONFIG_PATH } from '../configProvider';
 import { BaseEngine } from './baseEngine';

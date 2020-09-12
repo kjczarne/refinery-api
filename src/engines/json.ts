@@ -1,6 +1,6 @@
 import { BaseEngine, ExportCallbackType } from './baseEngine';
 import { IRecord } from '../interfaces';
-import { logger, isUrl } from '../utils';
+import { logger, isUrl } from '../utilities/utils';
 import { readFileSync, writeFileSync } from 'fs';
 import PouchDb from 'pouchdb';
 import PouchdbFind from 'pouchdb-find';

@@ -1,7 +1,7 @@
 import { RefineryDatabaseWrapper, constructRecords } from '../engine';
 import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { IRecord } from '../interfaces';
-import { logger } from '../utils';
+import { logger } from '../utilities/utils';
 import { create, map } from 'lodash';
 import dedent from 'ts-dedent';
 

@@ -1,8 +1,7 @@
 import { IRecord, IPageMap, IConfig } from './interfaces';
 import sha1 from 'sha1';
-import { delay, logger } from './utils';
-import { config, algorithmConfig, DEFAULT_CONFIG_PATH } from './configProvider';
-import { HtmlConvSpec } from './conversionSpecs';
+import { delay, logger } from './utilities/utils';
+import { config, DEFAULT_CONFIG_PATH } from './configProvider';
 import PouchDb from 'pouchdb';
 
 /**
@@ -19,19 +18,14 @@ export function constructRecord(
     dataField1: string,
     dataField2: string,
     source: string,
-    pageMap?: IPageMap,
-    configEntity: IConfig | string | undefined = undefined,
     batch: string = 'default',
     notebook: string = 'default',
     richContent: string = '',
     note: string = ''
 ): IRecord {
     let now: string = Date.now().toString();
-    let configObj: any = config(configEntity)
-    let algorithmConfigObj: any = algorithmConfig(batch, configObj);
 
     let record: IRecord = {
-        pageMap: pageMap,
         dataField1: dataField1,
         dataField2: dataField2,
         source: source,
@@ -42,13 +36,6 @@ export function constructRecord(
         batch: batch,
         pastExports: new Array<number>(),
         note: note,
-        flashcard: {
-            scheduler: {
-                easinessFactor: algorithmConfigObj.new.initialFactor,
-                pastRevisions: new Array<number>(),
-                nextRevision: Date.now()
-            }
-        },
         notebook: notebook
     }
     return record;

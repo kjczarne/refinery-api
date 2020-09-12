@@ -1,6 +1,6 @@
 import * as winston from 'winston';
 import { format } from 'logform';
-import { IRecord, displayCallback } from './interfaces';
+import { IRecord, displayCallback } from '../interfaces';
 
 /**
  * @function delay basic delay function (async)

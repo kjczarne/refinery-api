@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
 import flash from 'connect-flash';
-import { logger } from './utils';
+import { logger } from './utilities/utils';
 import fetch from 'node-fetch';
 import { config as cfg } from './configProvider';
 import { RefineryDatabaseWrapper } from './engine';

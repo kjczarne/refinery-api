@@ -1,6 +1,6 @@
 import { BaseEngine } from './baseEngine';
 import { IRecord } from '../interfaces';
-import { logger, isUrl } from '../utils';
+import { logger, isUrl } from '../utilities/utils';
 import { readFileSync, writeFileSync } from 'fs';
 import { convert, constructRecord } from '../engine';
 import { MdConvSpec } from '../conversionSpecs';
@@ -63,8 +63,6 @@ export class MdEngine extends BaseEngine {
         df1.trim(), 
         df2.trim(), 
         'Md', 
-        undefined, 
-        undefined, 
         batchUsed, 
         notebook
       );

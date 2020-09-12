@@ -1,5 +1,4 @@
 import * as yaml from 'yaml';
-import { IConfig } from './interfaces';
 import { readFileSync } from 'fs';
 
 export const DEFAULT_CONFIG_PATH = './configuration/.refinery.yaml'
@@ -22,28 +21,4 @@ export function config(config: string | any = DEFAULT_CONFIG_PATH){
     }
 }
 
-/**
- * @function deckConfig filters out the deck configuration section
- * @param deck deck name in the config file
- * @param configObj configuration Object as returned by `config` function
- */
-export function deckConfig(deck: string, configObj: any){
-    return configObj.phlower.decks.filter((el: any)=>{return el.cfgId == deck});
-}
-
-/**
- * @function algorithmConfig filters out the algorithm configuration section
- * @param deck deck name in the config file
- * @param configObj configuration Object as returned by `config` function
- */
-export function algorithmConfig(deck: string, configObj: any){
-    return configObj.phlower.algorithms.filter(
-        (el: any)=>{
-            // filter out algorithms named in the deckConfig...
-            return deckConfig(deck, configObj).filter(
-                (el2: any)=>{
-                    return el == el2.algorithm
-                }
-            )
-        })[0];  // ...and use the first matching algorithm
-}
+export default config;

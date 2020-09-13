@@ -1,5 +1,5 @@
 import { BaseEngine, ExportCallbackType } from './baseEngine';
-import { IRecord } from '../interfaces';
+import { Record } from '../record';
 import { logger, isUrl } from '../utilities/utils';
 import { readFileSync, writeFileSync } from 'fs';
 import PouchDb from 'pouchdb';
@@ -15,7 +15,7 @@ export class AndevFldsEngine extends BaseEngine {
     return pr;
   }
 
-  exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
+  exportCallback(output: string, records: Array<Record>, flipped: boolean) {
     let ids: Array<string> = new Array<string>();
     let serialized: string = '';
 
@@ -28,14 +28,14 @@ export class AndevFldsEngine extends BaseEngine {
         if (isUrl(fld.source)){
           url = ',' + fld.source
         }
-        if (fld.note !== undefined) {
-          examples = ',' + fld.note;
+        if (fld.data[2] !== undefined) {
+          examples = ',' + fld.data[2];
         }
         let optionalFields: string = examples + url
         if (flipped) {
-          row += fld.dataField2 + ',' + fld.dataField1 + optionalFields + '\n'
+          row += fld.data[1] + ',' + fld.data[0] + optionalFields + '\n'
         } else {
-          row += fld.dataField1 + ',' + fld.dataField2 + optionalFields + '\n'
+          row += fld.data[0] + ',' + fld.data[1] + optionalFields + '\n'
         }
         serialized += row;
       }

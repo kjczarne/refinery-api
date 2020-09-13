@@ -1,7 +1,7 @@
 import BaseEngine from './baseEngine';
 import { IRecord } from '../interfaces';
 import { HtmlConvSpec } from '../conversionSpecs';
-import { convert } from '../databaseWrapper';
+import { Record } from '../record';
 
 
 export class HtmlHandler extends BaseEngine {
@@ -25,12 +25,11 @@ export class HtmlHandler extends BaseEngine {
         cssTitleClass: string = 'title'
     ): string {
         let htmlCore: string = HtmlConvSpec.PRE(title, cssFile);
-        htmlCore += convert(
+        htmlCore += Record.convert(
             record, 
             title,
             HtmlConvSpec.WRAP_TITLE(cssTitleClass),
-            HtmlConvSpec.WRAP_DF1(cssDataField1Class),
-            HtmlConvSpec.WRAP_DF2(cssDataField2Class));
+            HtmlConvSpec.WRAP_DATA(cssDataField1Class, cssDataField2Class));
         htmlCore += HtmlConvSpec.TRAIL();
         return htmlCore;
     }

@@ -42,10 +42,7 @@ export class AppleiBooksEngine extends BaseEngine {
           let filteredResponse2 = response2.filter((v) => { return filteredResponse1.filter((v2) => { v2.assetId === v.assetId }) });
           // add ebook type info to the response object:
           filteredResponse2.forEach((v) => {
-            v['pageMap'] = { pagemapType: 'epubcfi', pagemapValue: v.pagemapValue };
-            v['richContent'] = '';
             v['source'] = bookName;
-            v['configPath'] = this.configPath;
             v['batch'] = batch;
             v['notebook'] = notebook
 

@@ -1,5 +1,5 @@
 import { BaseEngine, ExportCallbackType } from './baseEngine';
-import { IRecord } from '../interfaces';
+import { Record } from '../record';
 import { logger, isUrl } from '../utilities/utils';
 import { readFileSync, writeFileSync } from 'fs';
 import PouchDb from 'pouchdb';
@@ -12,11 +12,11 @@ export class JsonEngine extends BaseEngine {
 
   async load(filePath: string, batch?: string, notebook?: string): Promise<Array<string>> {
     let f: string = readFileSync(filePath, {encoding: 'utf-8'});
-    let records: Array<IRecord> = JSON.parse(f);
+    let records: Array<Record> = JSON.parse(f);
     return await this.importCallback(records);
   }
 
-  exportCallback(output: string, records: Array<IRecord>, flipped: boolean) {
+  exportCallback(output: string, records: Array<Record>, flipped: boolean) {
     let ids: Array<string> = new Array<string>();
     let serialized: string = '';
 

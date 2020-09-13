@@ -1,4 +1,5 @@
-import { RefineryDatabaseWrapper, constructRecords } from '../databaseWrapper';
+import { RefineryDatabaseWrapper } from '../database';
+import { Record } from '../record';
 import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { IRecord } from '../interfaces';
 import { logger } from '../utilities/utils';
@@ -38,7 +39,7 @@ export class BaseEngine {
    */
   async importCallback(arrayOfRecords: Array<IRecord>){
     let pr: Promise<Array<string>> = new Promise<Array<string>>((resolve, reject) => {
-      constructRecords(arrayOfRecords).then((response) => {
+      Record.constructRecords(arrayOfRecords).then((response) => {
           response.forEach((v) => { return JSON.stringify(v) });
           this.recordsDb.db.bulkDocs(response).then((res) => {
             logger.log({

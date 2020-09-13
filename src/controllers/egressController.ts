@@ -42,6 +42,14 @@ const argv = yargs.options(
     config: {
       type: 'string',
       demandOption: false
+    },
+    user: {
+      type: 'string',
+      demandOption: false
+    },
+    password: {
+      type: 'string',
+      demandOption: false
     }
   }
 ).argv;
@@ -66,16 +74,16 @@ const relayClosure = (engine: BaseEngine) => {
 switch (argv.what) {
   case 'andev':
     relayClosure(
-      new AndevEngine(config),
+      new AndevEngine(argv.user, argv.password, config),
     );
   case 'md': {
     relayClosure(
-      new MdEngine(config),
+      new MdEngine(argv.user, argv.password, config),
     )
   }
   case 'json': {
     relayClosure(
-      new JsonEngine(config),
+      new JsonEngine(argv.user, argv.password, config),
     )
   }
 }

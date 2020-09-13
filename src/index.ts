@@ -5,14 +5,8 @@ export { AndevFldsEngine } from './engines/andevFlashcards';
 
 export * from './interfaces';
 
-export { RefineryDatabaseWrapper } from './databaseWrapper';
+export { RefineryDatabaseWrapper } from './database';
 
 export { 
-    constructRecord, 
-    constructRecords, 
-    convert 
-} from './databaseWrapper';
-
-export { Scheduler } from './scheduler';
-
-export { FlashcardRevisionController } from './controllers/revisionController';
+    Record
+} from './record';

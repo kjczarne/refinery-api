@@ -1,12 +1,12 @@
-import { RefineryDatabaseWrapper } from '../databaseWrapper';
+import { RefineryDatabaseWrapper } from '../database';
+import { Record } from '../record';
 import { IRecord } from '../interfaces';
 import { logger } from '../utilities/utils';
 
 const db = new RefineryDatabaseWrapper("admin", "password");
 
-let minimalRecord: IRecord = {
-    dataField1: "lorem ipsum",
-    dataField2: "dolor set amet",
+let minimalRecordDoc: IRecord = {
+    data: ["lorem ipsum", "dolor set amet"],
     _id: 'lorem',
     timestampCreated: Date.now(),
     timestampModified: Date.now(),
@@ -14,18 +14,19 @@ let minimalRecord: IRecord = {
     notebook: 'default',
     batch: 'default',
     pastExports: new Array<number>(),
-    flashcard: {
-        scheduler: {
-            easinessFactor: 2.5,
-            pastRevisions: new Array<number>(),
-            nextRevision: Date.now()
-        }
-    }
 }
+
+let minimalRecord: Record = new Record(
+    minimalRecordDoc.data,
+    minimalRecordDoc.source,
+    minimalRecordDoc.batch,
+    minimalRecordDoc.notebook
+);
+minimalRecord._id = minimalRecordDoc._id;  // override to simple ID
 
 let a = async ()=>{
     try {
-        await db.db.put(minimalRecord);
+        await db.db.put(minimalRecord.doc());
     } catch(err) {
         logger.log({
             level: 'error',

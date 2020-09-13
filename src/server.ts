@@ -8,7 +8,7 @@ import flash from 'connect-flash';
 import { logger } from './utilities/utils';
 import fetch from 'node-fetch';
 import { config as cfg } from './configProvider';
-import { RefineryDatabaseWrapper } from './databaseWrapper';
+import { RefineryDatabaseWrapper } from './database';
 import ApiController from './controllers/apiController';
 import cors from 'cors';
 import { ExpectedParametersIngress, ExpectedParametersEgress} from './controllers/interfaces';

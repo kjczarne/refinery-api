@@ -11,22 +11,19 @@ export interface IPageMap {
   pagemapValue?: string
 }
 
+export type DataFieldType = [string, string] | [string, string, string] | Array<string>;
+
 /**
  * @interface IRecord
  * describes main piece of data thet is going to be handled by Refinery.
  * 
- * Modifiable elements are marked in comments.
- * This interface declares a string indexer and accepts
- * any additional properties in case existing fields do not
- * present enough context for additional data.
- * 
- * It is encouraged to add non-programatic data with names starting
- * with `dataField3` indexing upwards
+ * The new interface specifies a `data` field instead of `dataField1`
+ * and `dataField2` and the type allows for a flexible definition of
+ * stringified data that are being transported.
  */
 export interface IRecord {
   [x: string]: any,
-  dataField1: string,
-  dataField2: string,
+  data: DataFieldType,
   source: string,
   _id: string,
   _rev?: string,
@@ -35,9 +32,8 @@ export interface IRecord {
   pastExports: Array<number>,    // records batch exports to keep diffing easy
   notebook?: string,
   batch: string,
-  note?: string
   // future fields:
-  richContent?: string,
+  // LATER: handle file attachments
   pageMap?: IPageMap,
   flashcard?: IFlashcard,          // data related to flashcard representation
   linked?: string | Array<string>  // LATER: IDs of related IRecords

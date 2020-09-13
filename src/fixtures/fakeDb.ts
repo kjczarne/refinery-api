@@ -1,4 +1,4 @@
-import { RefineryDatabaseWrapper } from '../engine';
+import { RefineryDatabaseWrapper } from '../databaseWrapper';
 import { IRecord } from '../interfaces';
 import { logger } from '../utilities/utils';
 

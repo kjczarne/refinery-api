@@ -2,7 +2,7 @@ import { BaseEngine } from './baseEngine';
 import { IRecord } from '../interfaces';
 import { logger, isUrl } from '../utilities/utils';
 import { readFileSync, writeFileSync } from 'fs';
-import { convert, constructRecord } from '../engine';
+import { convert, constructRecord } from '../databaseWrapper';
 import { MdConvSpec } from '../conversionSpecs';
 import PouchDb from 'pouchdb';
 import PouchdbFind from 'pouchdb-find';

@@ -1,7 +1,7 @@
 import BaseEngine from './baseEngine';
 import { IRecord } from '../interfaces';
 import { HtmlConvSpec } from '../conversionSpecs';
-import { convert } from '../engine';
+import { convert } from '../databaseWrapper';
 
 
 export class HtmlHandler extends BaseEngine {

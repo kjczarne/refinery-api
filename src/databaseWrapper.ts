@@ -143,8 +143,6 @@ export async function constructRecords(
                 rec.dataField1, 
                 rec.dataField2,
                 rec.source,
-                rec.pageMap,
-                rec.configEntity,
                 rec.batch,
                 rec.notebook,
                 rec.richContent

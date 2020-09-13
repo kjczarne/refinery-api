@@ -1,4 +1,4 @@
-import { RefineryDatabaseWrapper, constructRecords } from '../engine';
+import { RefineryDatabaseWrapper, constructRecords } from '../databaseWrapper';
 import { config, DEFAULT_CONFIG_PATH } from '../configProvider';
 import { IRecord } from '../interfaces';
 import { logger } from '../utilities/utils';

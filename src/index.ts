@@ -5,13 +5,13 @@ export { AndevFldsEngine } from './engines/andevFlashcards';
 
 export * from './interfaces';
 
-export { RefineryDatabaseWrapper } from './engine';
+export { RefineryDatabaseWrapper } from './databaseWrapper';
 
 export { 
     constructRecord, 
     constructRecords, 
     convert 
-} from './engine';
+} from './databaseWrapper';
 
 export { Scheduler } from './scheduler';
 

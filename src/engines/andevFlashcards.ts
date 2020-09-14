@@ -10,6 +10,11 @@ export class AndevFldsEngine extends BaseEngine {
   
   static descriptor = 'AnDev Flashcards'
 
+  static arg = 'andev';
+
+  static hasIngress = false;
+  static hasEgress = true;
+
   async load(): Promise<string> {  // TODO: AnDev ingress
     let pr: Promise<string> = new Promise<string>((resolve, reject) => {});
     return pr;

@@ -2,19 +2,17 @@
 // use process.parameters here, first two args are the node command elements (node, script path)
 import relayEgress from '../relays/egressRelay';
 import relayIngress from '../relays/ingressRelay';
-import AndevEngine from '../engines/andevFlashcards';
-import MdEngine from '../engines/markdown';
-import JsonEngine from '../engines/json';
 import BaseEngine from '../engines/baseEngine';
 import { ExpectedParametersEgress, ExpectedParametersIngress } from './interfaces';
-import { AppleiBooksEngine } from '../engines/iBooks';
+import { BaseController } from './baseController';
 
-export class ApiController {
+export class ApiController extends BaseController {
 
   private _username: string | undefined;
   private _password: string | undefined;
 
   constructor(username?: string, password?: string) {
+    super();
     this._username = username;
     this._password = password;
   }
@@ -52,57 +50,19 @@ export class ApiController {
 
   refineIn(parameters: Exclude<ExpectedParametersIngress, { config: string }> 
     & Required<Pick<ExpectedParametersIngress, "resource">>) {
-      switch (parameters.what) {
-        case 'ibooks': {
-          this.relayClosureIngress(
-            new AppleiBooksEngine(
-              this._username,  // TODO: reduce code duplication here
-              this._password
-            ),
-            parameters
-          )
-        }
-        case 'md': {
-          this.relayClosureIngress(
-            new MdEngine(
-              this._username,
-              this._password
-            ),
-            parameters
-          )
-        }
-      }
+      let idx = this.allEngineNames.findIndex((val)=>{return val === <string>parameters.what});
+      this.relayClosureIngress(
+        new this.allEngines[idx](this._username, this._password, this.config),
+        parameters
+      );
     }
   
   refineOut(parameters: Exclude<ExpectedParametersEgress, { config: string }>) {
-    switch (parameters.what) {
-      case 'andev':
-        return this.relayClosureEgress(
-          new AndevEngine(
-            this._username,
-            this._password
-          ),
-          parameters
-        );
-      case 'md': {
-        return this.relayClosureEgress(
-          new MdEngine(
-            this._username,
-            this._password
-          ),
-          parameters
-        )
-      }
-      case 'json': {
-        return this.relayClosureEgress(
-          new JsonEngine(
-            this._username,
-            this._password
-          ),
-          parameters
-        )
-      }
-    }
+    let idx = this.allEngineNames.findIndex((val)=>{return val === <string>parameters.what});
+    this.relayClosureEgress(
+      new this.allEngines[idx](this._username, this._password, this.config),
+      parameters
+    );
   }
 }
 

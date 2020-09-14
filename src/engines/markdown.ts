@@ -12,6 +12,11 @@ export class MdEngine extends BaseEngine {
 
   static descriptor = 'Plain Markdown'
 
+  static arg = 'md'
+
+  static hasEgress = true;
+  static hasIngress = true;
+
     /**
    * @function convertToMarkdown Converts IRecords to a Markdown
    * serialized string.

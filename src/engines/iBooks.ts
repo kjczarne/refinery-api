@@ -10,6 +10,11 @@ export class AppleiBooksEngine extends BaseEngine {
 
   static descriptor = 'iBooks'
 
+  static arg = 'ibooks'
+
+  static hasEgress = false;
+  static hasIngress = true;
+
   private _sqlQuery1: string = dedent`
     SELECT 
     ZASSETID AS assetId,

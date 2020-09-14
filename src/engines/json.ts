@@ -10,6 +10,11 @@ export class JsonEngine extends BaseEngine {
   
   static descriptor = 'JSON record'
 
+  static arg = 'json';
+
+  static hasEgress = true;
+  static hasIngress = true;
+
   async load(filePath: string, batch?: string, notebook?: string): Promise<Array<string>> {
     let f: string = readFileSync(filePath, {encoding: 'utf-8'});
     let records: Array<Record> = JSON.parse(f);

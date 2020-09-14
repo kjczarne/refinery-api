@@ -1,3 +1,4 @@
+export { BaseEngine } from './engines/baseEngine';
 export { MdEngine } from './engines/markdown';
 export { AppleiBooksEngine } from './engines/iBooks';
 export { JsonEngine } from './engines/json';

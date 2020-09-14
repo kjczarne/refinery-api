@@ -16,6 +16,9 @@ export class BaseEngine {
   config: any;
   recordsDb: RefineryDatabaseWrapper;
   static descriptor: string;
+  static arg: string;
+  static hasIngress: boolean = false;
+  static hasEgress: boolean = false;
 
   constructor(username?: string, password?: string, configPath: string = DEFAULT_CONFIG_PATH) {
     this.configPath = configPath;

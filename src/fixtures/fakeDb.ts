@@ -23,10 +23,10 @@ let minimalRecord: Record = new Record(
     minimalRecordDoc.notebook
 );
 minimalRecord._id = minimalRecordDoc._id;  // override to simple ID
-
+console.log(minimalRecord)
 let a = async ()=>{
     try {
-        await db.db.put(minimalRecord.doc());
+        await db.db.put(minimalRecord);
     } catch(err) {
         logger.log({
             level: 'error',

@@ -7,25 +7,14 @@ import JsonEngine from '../engines/json';
 import yargs from 'yargs';
 import { DEFAULT_CONFIG_PATH } from '../configProvider';
 import BaseEngine from '../engines/baseEngine';
+import { BaseController } from './baseController';
+
+const baseCtl = new BaseController();
 
 const argv = yargs.options(
   {
-    what: {
-      type: 'string',
-      demandOption: true,
-      choices: [
-        'md', 'andev'
-      ]
-    },
+    what: baseCtl.whatEgress,
     path: {
-      type: 'string',
-      demandOption: true
-    },
-    batch: {
-      type: 'string',
-      demandOption: true
-    },
-    notebook: {
       type: 'string',
       demandOption: true
     },
@@ -39,23 +28,12 @@ const argv = yargs.options(
       demandOption: false,
       default: false
     },
-    config: {
-      type: 'string',
-      demandOption: false
-    },
-    user: {
-      type: 'string',
-      demandOption: false
-    },
-    password: {
-      type: 'string',
-      demandOption: false
-    }
+    ...baseCtl.commonOptions
   }
 ).argv;
 
 if (argv.config !== undefined) {
-  var config = argv.config;
+  var config = <string>argv.config;
 } else {
   var config = DEFAULT_CONFIG_PATH
 }
@@ -64,27 +42,17 @@ const relayClosure = (engine: BaseEngine) => {
   relay(
     engine,
     argv.path,
-    argv.batch,
-    argv.notebook,
+    <string>argv.batch,
+    <string>argv.notebook,
     argv.diff,
     argv.flipped
   );
 }
 
-switch (argv.what) {
-  case 'andev':
-    relayClosure(
-      new AndevEngine(argv.user, argv.password, config),
-    );
-  case 'md': {
-    relayClosure(
-      new MdEngine(argv.user, argv.password, config),
-    )
-  }
-  case 'json': {
-    relayClosure(
-      new JsonEngine(argv.user, argv.password, config),
-    )
-  }
-}
+// the following finds the correct engine based on argv.what
+// and relays instantiation and Egress call
+let idx = baseCtl.allEngineNames.findIndex((val)=>{return val === <string>argv.what});
+relayClosure(
+  new baseCtl.allEngines[idx](<string>argv.user, <string>argv.password, config)
+);
 

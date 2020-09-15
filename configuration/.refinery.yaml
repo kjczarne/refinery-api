@@ -6,8 +6,8 @@ refinery:
     password: password
   files:
     loc: './localFiles'
-  customEngines:
-    - './tests/res/fakeEngine.js'
+  # customEngines:
+  #   - './tests/res/fakeEngine.js'
 # This section configures which iBooks databases
 # will be consumed
 ibooks:

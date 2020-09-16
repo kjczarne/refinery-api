@@ -1,7 +1,7 @@
-import { RefineryDatabaseWrapper } from '../database';
-import { Record } from '../record';
-import { IRecord } from '../interfaces';
-import { logger } from '../utilities/utils';
+import { RefineryDatabaseWrapper } from 'refinery-core';
+import { Record } from 'refinery-core';
+import { IRecord } from 'refinery-core';
+import { logger } from 'refinery-core';
 
 const db = new RefineryDatabaseWrapper("admin", "password");
 

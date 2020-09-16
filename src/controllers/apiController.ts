@@ -2,7 +2,7 @@
 // use process.parameters here, first two args are the node command elements (node, script path)
 import relayEgress from '../relays/egressRelay';
 import relayIngress from '../relays/ingressRelay';
-import BaseEngine from '../engines/baseEngine';
+import { BaseEngine } from 'refinery-engines';
 import { ExpectedParametersEgress, ExpectedParametersIngress } from './interfaces';
 import { BaseController } from './baseController';
 

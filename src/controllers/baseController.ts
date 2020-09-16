@@ -1,10 +1,10 @@
 import { string } from "yargs";
-import { BaseEngine } from '../engines/baseEngine';
-import { AndevFldsEngine } from '../engines/andevFlashcards';
-import { AppleiBooksEngine } from '../engines/iBooks';
-import { JsonEngine } from '../engines/json';
-import { MdEngine } from '../engines/markdown';
-import { config } from '../configProvider';
+import { BaseEngine } from 'refinery-engines';
+import { AndevFldsEngine } from 'refinery-engines';
+import { AppleiBooksEngine } from 'refinery-engines';
+import { JsonEngine } from 'refinery-engines';
+import { MdEngine } from 'refinery-engines';
+import { config } from 'refinery-core';
 import yargs from 'yargs';
 import _ from 'lodash';
 import path from 'path';

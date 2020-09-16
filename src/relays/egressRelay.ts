@@ -1,5 +1,5 @@
-import { logger } from '../utilities/utils';
-import { BaseEngine } from '../engines/baseEngine';
+import { logger } from 'refinery-core';
+import { BaseEngine } from 'refinery-engines';
 
 let f = (
   engine: BaseEngine,

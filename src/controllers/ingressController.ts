@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import relay from '../relays/ingressRelay';
-import { BaseEngine } from '../engines/baseEngine';
-import { DEFAULT_CONFIG_PATH } from '../configProvider';
+import { BaseEngine } from 'refinery-engines';
+import { DEFAULT_CONFIG_PATH } from 'refinery-core';
 import yargs from 'yargs';
 import { BaseController } from './baseController';
 

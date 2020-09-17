@@ -1,4 +1,4 @@
-import { RefineryDatabaseWrapper } from 'refinery-core';
+import { RefineryDatabaseWrapper } from 'refinery-engines';
 import { Record } from 'refinery-core';
 import { IRecord } from 'refinery-core';
 import { logger } from 'refinery-core';

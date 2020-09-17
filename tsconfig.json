@@ -12,6 +12,6 @@
       "esModuleInterop": true,
       "declaration": true
     },
-    "include": ["src/**/*", "tests/**/*"],
+    "include": ["src/**/*", "tests/**/*", "../phlower-engines/tests/ibooks"],
     "exclude": ["node_modules", "**/*.spec.ts"]
 }

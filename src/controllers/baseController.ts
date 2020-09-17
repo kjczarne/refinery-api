@@ -5,6 +5,7 @@ import { AppleiBooksEngine } from 'refinery-engines';
 import { JsonEngine } from 'refinery-engines';
 import { MdEngine } from 'refinery-engines';
 import { config } from 'refinery-core';
+import { YourEngines } from '../yourEngines';
 import yargs from 'yargs';
 import _ from 'lodash';
 import path from 'path';
@@ -110,13 +111,18 @@ export class BaseController {
 
   /**
    * @function _loadExtraEngines loads user-defined Engines using
-   * paths to scripts specified in the config
+   * paths to scripts specified in the yourEngines.ts
    */
   private _loadExtraEngines() {
-    let additionalEngineFilePaths: Array<string> | undefined = this.config.refinery.customEngines
-    if (additionalEngineFilePaths !== undefined) {
-      for (let p of additionalEngineFilePaths) {
-        this.extraEngines.push(require(path.resolve(p)));
+    if (YourEngines.length > 0) {
+      try {
+        for (let p of YourEngines) {
+          this.extraEngines.push(p);
+        }
+      } catch (err) {
+        for (let p of YourEngines) {
+          this.extraEngines.push(p);
+        }
       }
     }
   }

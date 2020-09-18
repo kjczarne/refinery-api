@@ -3,7 +3,7 @@
 import relay from '../relays/egressRelay';
 import yargs from 'yargs';
 import { DEFAULT_CONFIG_PATH } from 'refinery-core';
-import { BaseEngine } from 'refinery-engines';
+import { BaseEngine } from 'refinery-core';
 import { BaseController } from './baseController';
 
 const baseCtl = new BaseController();

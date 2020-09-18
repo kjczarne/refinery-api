@@ -1,4 +1,4 @@
-import { RefineryDatabaseWrapper } from 'refinery-engines';
+import { RefineryDatabaseWrapper } from 'refinery-core';
 
 const db = new RefineryDatabaseWrapper("admin", "password");
 

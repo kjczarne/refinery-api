@@ -18,23 +18,21 @@ At the core, each such pair of text fields is transformed into a slightly more e
 
 ```json
 {
-  "dataField1": "string",
-  "dataField2": "string",
-  "source": "string",
-  "_id": "string",
-  "_rev": "string",
-  "timestampCreated": 12345679,
-  "timestampModified": 12345679,
-  "pastExports": [12345678, 12345679],
-  "notebook": "string",
-  "batch": "string",
-  "note": "string"
+  "data": ["front", "back"],
+  "source": "some book",
+  "_id": "uniqueHash",
+  "_rev": "revisionHash",
+  "timestampCreated": 12345678,
+  "timestampModified": 12345678,
+  "pastExports": [12345678, 12345678],
+  "notebook": "default",
+  "batch": "default",
 }
 ```
 
-Fields `notebook`, `note` and `_rev` are optional. `_rev` is a document version tag used by CouchDb. `note` is an optional third field that contains extra textual information decoupled from the actual flashcard. The fields that contain the paired flashcard data are `dataField1` and `dataField2`.
+Fields `notebook`, `note` and `_rev` are optional. `_rev` is a document version tag used by CouchDb. `note` is an optional third field that contains extra textual information decoupled from the actual flashcard. The field that contains the paired flashcard data is simply named `data`. It supports a two-tuple of strings as well as an array of strings, so if you wish to store more fields in an array, you have such possibility.
 
-You have two levels of hierarchy in the docs: `batch` and `notebook`. `batch` is obligatory on the interface but usually when you don't provide a `batch` parameter when sending anything through Refinery to the database, it will simply set `batch` to `true`.
+You have two levels of hierarchy in the docs: `batch` and `notebook`. `batch` is obligatory on the interface but usually when you don't provide a `batch` parameter when sending anything through Refinery to the database, it will simply set `batch` to `default`.
 
 The remaining fields help out with stuff like filtering. Say you want to select only the documents created yesterday. You use a selector when sending a query to the CouchDB that discriminates against the `timestampCreated` field. The `pastExports` array records all the export events that have taken place, so that you can figure out what diff value to use to e.g. filter only new flashcards in the deck you've exported a few days ago.
 
@@ -48,6 +46,7 @@ To learn how to deploy this project and start using it, scroll down to the *How 
 * conversion to AnDev Flashcards CSV
 * conversion to Markdown summaries
 * basic REST API for a self-deployed server (can receive and send files)
+* ability to add your own engines (if you're into TypeScript coding)
 
 ### Conversion Matrix
 
@@ -57,7 +56,7 @@ Various adapters (handlers/engines) are available but not all of them are bidire
 |-------------------|--------------------|------------------------|----------|
 | AnDev Flashcards  | **Yes**            | In development         | `andev`  |
 | Anki Flashcards   | In development     | In development         | n/a      |
-| Apple iBooks      | No                 | **Yes** (macOS sqlite) | n/a      |
+| Apple iBooks      | No                 | **Yes** (macOS sqlite) | `ibooks` |
 | Audible           | No                 | Planned for future     | n/a      |
 | JSON              | **Yes**            | **Yes**                | `json`   |
 | Markdown          | **Yes**            | **Yes**                | `md`     |
@@ -72,7 +71,7 @@ Various adapters (handlers/engines) are available but not all of them are bidire
     * `REFINERY_USER` -> username, same as for your CouchDb
     * `REFINERY_PASSWORD` -> password, same as for your CouchDb
     It's recommended that you set these variables each time you use a terminal session and not keep them in any dotfiles.
-3. Install this using `npm i -g .` when in the cloned repo's folder.
+3. Install this using `npm i -g refinery-api`. You need to have Node.JS with NPM package manager installed.
 4. Use the `./configuration/.refinery.yaml` file to set up:
     ```yaml
     refinery:
@@ -85,17 +84,19 @@ Various adapters (handlers/engines) are available but not all of them are bidire
       annotationsDb: "./tests/res/ibooks/ibooks_db_mock.sqlite"
       libraryDb: "./tests/res/ibooks/ibooks_library_mock.sqlite"
     ```
-    You need to provide a URL to a running CouchDB instance and a database name where the docs will be stored. Don't worry if the DB doesn't exist, Couch will create it if it's not there. You may also want to adjust the path to your `iBooks` sqlite database if you're on `macOS` and intend to use the iBooks highlights extraction functionality.
+    You need to provide a URL to a running CouchDB instance and a database name where the docs will be stored. Don't worry if the DB doesn't exist, Couch will create it if it's not there. You may also want to adjust the path to your `iBooks` sqlite database if you're on `macOS` and intend to use the iBooks highlights extraction functionality. You can keep the `ibooks` section default if you don't intend to use it.
 
 ### Use as a CLI tool
 
 Use `refinery-in` for ingress and `refinery-out` for egress, e.g. `refinery-out --what=md --path=temp.md --set=default --notebook=default` -> converts the `default` batch of records belonging to the `default` notebook to a Markdown file called `temp.md`.
 
+If you run any of these commands with a `--help` flag, you should see the possible flags you can use.
+
 ### Use as a self-hosted server
 
 1. Set `REFINERY_SECRET` environment variable to any safe string. This will be used by the server to create a cookie session.
 2. Optional: set `REFINERY_SERVER_PORT`. If this is not set the server will be available by default on port `42069`.
-3. To run the server use `refinery-serve` command. This spins up an Express.JS instance.
+3. To run the server use `refinery-serve` command. This spins up an Express.JS instance. Remember you still need a separate server deploying CouchDB.
 
 ### Loading in Markdown Files
 
@@ -118,12 +119,12 @@ As of now, the most stable offering is the Markdown Ingress/Egress. Ingress will
 ⚗️
 ```
 
-The pattern of bullet lists starting with dashes and indented answer blocks is for now obligatory to use but in the near future you'll have the possibility of defining your own specification on how to parse and dump the MD files. The current spec is the exact format that Notion dumps its toggle lists in, so you can already use MD files exported from Notion until the native API gets released and lets me play around the topics of sync and smarter format handling.
+The pattern of bullet lists starting with dashes and indented answer blocks is for now obligatory to use but in the **near future** (believe me, I want it myself) you'll have the possibility of defining your own specification on how to parse and dump the MD files. The current spec is the exact format that Notion dumps its toggle lists in, so you can already use MD files exported from Notion until the native API gets released and lets me play around the topics of sync and smarter format handling.
 
 ## Plans for the future
 
-* direct HTML highlighting and notetaking with egress handler
+* direct HTML highlighting and notetaking with egress handler -> required feedback, isn't interface to Instapaper a better approach (it's best not to reinvent the wheel)
 * mobile front-end for easy manual record creation
 * ~~REST API for easy interfacing with the front end app~~ ✅
 * flexible specification, e.g. provide own regex pattern to parse MD files
-* user-defined plugins
+* ~~user-defined plugins~~ ✅

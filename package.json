@@ -1,7 +1,7 @@
 {
   "name": "refinery-api",
-  "version": "0.0.1a",
-  "description": "PDF and EPUB annotations extractor",
+  "version": "0.2.0",
+  "description": "Automated atomic information processor.",
   "main": "./built/src/index.js",
   "scripts": {
     "start": "node ./built/server.js",

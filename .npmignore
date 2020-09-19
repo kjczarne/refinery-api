@@ -1,0 +1,23 @@
+# General
+stash
+debug
+.DS_Store
+.vscode
+*.log
+temp.*
+localFiles
+
+# Node
+node_modules
+
+# Test Coverage and testing
+.nyc*
+coverage
+mantest.*
+
+# DO NOT IGNORE BUILT ASSETS
+# built
+
+# Anki
+*.apkg
+*.sqlite

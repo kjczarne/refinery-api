@@ -1,6 +1,6 @@
 {
   "name": "refinery-api",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Automated atomic information processor.",
   "main": "./built/src/index.js",
   "scripts": {
